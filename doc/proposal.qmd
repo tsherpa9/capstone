@@ -1,7 +1,7 @@
 ---
-title: "Proposal: [Your project name]"
+title: "Proposal: [Food Accessibility at the County Level]"
 subtitle: "DATA 450 Capstone"
-author: "[Your Name]"
+author: "[Tenzin Sherpa]"
 date: today
 bibliography: references.bib
 number-sections: true
