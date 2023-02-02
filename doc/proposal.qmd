@@ -1,8 +1,8 @@
 ---
-title: "Proposal: [Food Accessibility at the County Level]"
+title: "Proposal: Food Accessibility at the County Level"
 subtitle: "DATA 450 Capstone"
-author: "[Tenzin Sherpa]"
-date: today
+author: "Tenzin Sherpa"
+date: February 5 2023
 bibliography: references.bib
 number-sections: true
 format:
@@ -16,17 +16,15 @@ jupyter: python3
 
 # Dataset
 
-[In this section, desribe the dataset(s). This includes things like where you
-obtained the dataset. Include a full citation, as specified 
-[here](https://guides.lib.umich.edu/c.php?g=282964&p=3285995). Describe how the
-data was obtained by the data owner/curator, as best as you can. List the 
-variables that you plan to use in your analysis, for example:
+The project will use the Food Environment Atlas Data from 9/10/2020 found [here](https://www.ers.usda.gov/data-products/food-environment-atlas/data-access-and-documentation-downloads/). The dataset has been compiled by the US Department of Agriculture (USDA) Economic Research Service (ERS) for purposes of studying factors that affect food choices and the accessibility to healthy foods in communities. 
+The dataset contains county level information on food environment factors such as access to grocery stores/supermarkets/restaurants, local food sales, food prices, food assistance programs like SNAP (Supplemental Nutrition Assistance Program), National School Lunch Program, etc., socioeconomic characteristics and some health/physical activities. State level information on food taxes, and household food insecurity are also available. The data have been collected through various reports from the Census, USDA for years ranging from 2010 to 2019.
+For further interest on the variables, a detailed documentation can be found [here](https://www.ers.usda.gov/data-products/food-environment-atlas/documentation/#insecurity).
+
+Describe how the data was obtained by the data owner/curator, as best as you can. List the variables that you plan to use in your analysis, for example:
 
 * weight: The patient's weight (kg)
 * sex: The patient's sex, male or female
 * age: The patient's age (months)
-
-]
 
 # Data Acquisition and Processing
 
