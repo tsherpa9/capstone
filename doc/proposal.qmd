@@ -16,65 +16,122 @@ jupyter: python3
 
 # Dataset
 
-The project will use the Food Environment Atlas Data from 9/10/2020 found [here](https://www.ers.usda.gov/data-products/food-environment-atlas/data-access-and-documentation-downloads/). The dataset has been compiled by the US Department of Agriculture (USDA) Economic Research Service (ERS) for purposes of studying factors that affect food choices and the accessibility to healthy foods in communities. 
-The dataset contains county level information on food environment factors such as access to grocery stores/supermarkets/restaurants, local food sales, food prices, food assistance programs like SNAP (Supplemental Nutrition Assistance Program), National School Lunch Program, etc., socioeconomic characteristics and some health/physical activities. State level information on food taxes, and household food insecurity are also available. The data have been collected through various reports from the Census, USDA for years ranging from 2010 to 2019.
-For further interest on the variables, a detailed documentation can be found [here](https://www.ers.usda.gov/data-products/food-environment-atlas/documentation/#insecurity).
+The project will use the Food Environment Atlas Data from 9/10/2020 found [here](https://www.ers.usda.gov/data-products/food-environment-atlas/data-access-and-documentation-downloads/). The dataset has been compiled by the US Department of Agriculture (USDA) Economic Research Service (ERS) for purposes of studying factors that affect food choices and the accessibility to healthy foods in communities. The dataset contains county-level information on food environment factors such as access to grocery stores/supermarkets/restaurants, local food sales, food prices, food assistance programs like SNAP (Supplemental Nutrition Assistance Program), National School Lunch Program, etc., socioeconomic characteristics, and some health/physical activities. State-level information on food taxes, and household food insecurity are also available. More extensive documentation on each variable can be found [here](https://www.ers.usda.gov/data-products/food-environment-atlas/documentation/#insecurity).
 
-Describe how the data was obtained by the data owner/curator, as best as you can. List the variables that you plan to use in your analysis, for example:
+The dataset has been compiled using various reports from the USDA, the Bureau of the Census, the U.S. Department of Commerce, and more. Some variable values, like those from the 2010 census, were measured directly while others were estimates calculated in the source reports. The data cover the years 2006 to 2019 as separate reports published over a decade were used to create this dataset. However, the focus of the dataset is on the years 2010 and 2015. Hence, this project will also work on analysis relevant to these years.
 
-* weight: The patient's weight (kg)
-* sex: The patient's sex, male or female
-* age: The patient's age (months)
+Some of the variables that are of interest to this project are listed below. They are listed under categories because of the large number of variables.
+
+* FIPS: Code to uniquely identify counties    
+
+* Population with low access to stores: Living more than 1 mile from a supermarket or large grocery store if in an urban area, or more than 10 miles from a supermarket or large grocery store if in a rural area.
+  + Population, low access (%) (2010, 2015)
+  + Low income and low access to store (%)
+  + Households, no car and low access to store (%) (2010, 2015)
+  + SNAP households, low access to store (%)
+  + Children, low access to store (%)
+  + Seniors, low access to store (%)
+  + Race group, low access (%) 2015
+
+* Stores: 
+  + Grocery stores, supercenters, convenience stores, SNAP-authorized stores, specialized food stores (all in '/1000 population' values for 2011 and 2016).
+
+* Restaurants: (2011 and 2016) 
+  + Fast-food restaurants, Full-service restaurants (in '/1000 population' values).
+
+* Food Assistance:
+**(2012, 2017)**
+  + SNAP participants (percent pop) 
+  + National School Lunch Program participants (percent children)
+  + School Breakfast Program participants (percent children)
+  + Summer Food Service Program participants (percent children)
+  + Food Distribution Program on Indian Reservations (FDPIR) Sites (2012, 2015)
+
+* State Food Insecurity (from 2012-14 and 2015-17)
+  + Household food insecurity (percent, 3-year average): Households unable to provide enough food during a year for one or more household members.
+
+* Local Foods:
+  + Farmer markets /1,000 pop (2013, 2018)
+  + Farms with direct sales
+  + Food hubs (2018)
+
+* Socioeconomic characteristics
+  + 2010 Percentage of the county resident population that is White, Black, Hispanic, Asian, Hawaiian or Pacific Islander, 65 years or older, under 18
+  + Median household income, poverty rate, and child poverty rates in 2015
 
 # Data Acquisition and Processing
 
-[In this section, if applicable, describe how you will obtain the data (if it's
-anything more complicated than a simple download). Discuss what data 
-processing steps will be needed, such as recoding variables, data cleaning,
-data tidying, imputing missing values, etc. See sections 1c, 1d, 1e in the 
-"Good Enough Practices" paper.]
+Before analysis work, I will check if any variables of interest have missing values. Initial exploration of the dataset showed that some fields have a high number of missing values which makes such variables less useful. For example, data on the WIC (Women, Infants, and Children) program had excessive missing values across the dataset. Such variables will be discarded from any analysis. Any remaining variables should be checked to see if they have the correct data type.     
+
+Next, I will work on imputing other missing values using similar/average values for the surrounding counties. If this is not possible, I will use median values for imputation. I will also check for outliers for quantitative variables.   
+
+Addtionally, the dataset holds data in multiple spreadsheets. An important task then would be to join the variables of interest based on the FIPS number which are the unique identifiers for counties. After attaining a final dataframe with cleaned data, I will also work on recoding variables. This recoded variables will also have a lookup/list of descriptions for the new names.   
 
 # Research Questions and Methodology
 
-[In this section, list each of the questions you will explore. Following each
-question, provide a detailed and specific plan for how you plan to answer the 
-question. Include the specific steps you will take, what form the answer will 
-take (a number? table? visualization? model? Give all the specifics), and 
-estimate how many hours each question will take to complete.]
+1) Which counties have the lowest accessibility to stores? Are they concentrated in certain cities/regions/states? (5 hours)   
+I will investigate this question by creating a heatmap of low accessibility populations in the counties. The variables that give the percentage of the population considered to have low access will be useful for charting this. I will create separate heatmaps for the years 2010 and 2015. In the heatmaps, a darker shade of color would indicate a higher percentage of the population with low access to food, meaning these areas would have a greater problem with food accessibility.   
+Additionally, I will work on how to filter for counties with low access to food. This categorization may help scale down the problem and focus on areas that need the most help.
 
-1. Is smoking correlated with diabetes? To answer this, I will create a filled
-bar plot, with the left bar representing non-smokers, the middle bar
-representing people who smoke moderately, and the right bar representing heavy
-smokers. The bars will be the same height, and each bar will be
-colored two colors based on the proportion of patients in the group who do or
-do not have diabetes.
+2) What demographic is affected the most in low accessibility regions? (5 hours)   
+After identifying counties with greater issues of food accessibility, I will explore the demographics of the population. To look at the overall picture, I will find the average percentage of people under different categories (race, age, income) that have low access. For example, I will use the average of % seniors with low access from different counties. A table or bar plot may be useful to communicate the findings.   
+For a more detailed analysis, I will create heatmaps of the demographic category facing the lowest accessibility. This may help to understand how low accessibility affects people of different races in selected counties.   
 
-2. Question 2? Plan for question 2.
+3) Does the availability of vehicles drastically change the food insecurity level? (1 hour)    
+For this question, I will use pie charts to see what percentage of people with low access have cars.   
+  
+4) What is the distribution of stores, restaurants, local sources, and assistance programs? (4 hours)   
+I will illustrate this with a heatmap where low access areas will be represented by boundaries while colors represent the density of stores and other food sources there. 
 
-3. Question 3? Plan for question 3.
+5) How much has food insecurity changed in states? (1 hour)    
+I will select counties that had some of the lowest and highest population percentages with low access to food, and create a table that records the percentage change in food security from 2010 to 2015.
 
-4. etc.
+6) What is the relationship between income and food access? (2 hours)   
+I will use a scatterplot of the median household income and low access percent population for different counties to investigate any trends.  
+
+7) How is the type of store available related to accessibility? How are the demographic & socioeconomic characteristics of the population and food access in the county connected? (6 hours)   
+I will use a clustering method to answer this question. Before applying a clustering algorithm, I will create sub-dataframes with only selected columns. For instance, to answer the first question, I will use the low-access population percentages along with different store types. 
+
+8) Do food assistance programs strongly benefit counties with low food access? (5 hours)     
+I will compare the low access percent population with the percent population receiving benefits using a scatterplot.   
 
 # Work plan
 
-[Fill in the list below with a plan for what you will do each week. You should
-have around 7 hours worth of work each week. Writing work counts. Several tasks
-have already been filled in for you.]
+**Week 4 (2/6 - 2/12):** 
 
-**Week 4 (2/6 - 2/12):** [Just an example: 
+* Data tidying and transforming (4 hours)
 
-* Data tidying and recoding (4 hours)
-* Question 2 (4 hours).]
+* Question 1 (5 hours)
+
 
 **Week 5 (2/13 - 2/19):**
 
+* Question 2 (5 hours)
+
+* Question 3 (1 hour)
+
+* Question 5 (1 hour)
+
+* Question 4 (2 hours)
+
+
 **Week 6 (2/20 - 2/26):**
+
+* Question 4 (2 hours)
+
+* Question 7 (6 hours)
+
 
 **Week 7 (2/27 - 3/5):**
 
+* Question 8 (5 hours)
+
+* Question 6 (2 hours)
+
 * Presentation prep and practice (4 hours)
 
-**Week 8 (3/6 - 3/12):** *Presentations in class on Thurs 3/9.*
+**Week 8 (3/6 - 3/12):** 
+*Presentations in class on Thurs 3/9.*
 
 * Presentation peer review (1.5 hours)
 
@@ -96,9 +153,7 @@ have already been filled in for you.]
 
 **Week 12 (4/10 - 4/16):**
 
-**Week 13 (4/17 - 4/23):** [All project work should be done by the end of this 
-week. The remaining time will be used for writing up and presenting your 
-results.]
+**Week 13 (4/17 - 4/23):**   *Finish all project work*
 
 * Draft blog post (5 hours).
 
@@ -106,45 +161,14 @@ results.]
 
 * Peer feedback (2.5 hours)
 * Blog post revisions (2 hours)
-* [Do not schedule any other tasks for this week.]
 
 **Week 15 (5/1 - 5/7):**  *Final blog post due Tuesday 5/2*.
 
 * Final presentation prep and practice.
 
-* [Do not schedule any other tasks for this week.]
+**Final Exam Week (5/8):** 
+*Final Presentations during final exam slot, Monday May 9th 3:20-6:40pm.* 
 
-**Final Exam Week (5/8):** *Final Presentations during final exam slot,
-Monday May 9th 3:20-6:40pm.* [Do not schedule any other tasks for this week.]
-
-## Some cool Quarto stuff
-
-[You can delete this section from your proposal.]
-
-For your reference, here's an example of a Python code cell in Quarto,
-along with a figure that gets generated, along with a caption and a label
-so that it can be referred to automatically as "Figure 1" (or whatever)
-in the writeup.
-
-For a demonstration of a line plot on a polar axis, see @fig-polar.
-
-```{python}
-#| label: fig-polar
-#| fig-cap: "A line plot on a polar axis"
-
-import numpy as np
-import matplotlib.pyplot as plt
-
-r = np.arange(0, 2, 0.01)
-theta = 2 * np.pi * r
-fig, ax = plt.subplots(
-  subplot_kw = {'projection': 'polar'} 
-)
-ax.plot(theta, r)
-ax.set_rticks([0.5, 1, 1.5, 2])
-ax.grid(True)
-plt.show()
-```
 
 Here's an example of citing a source [see @phil99, pp. 33-35]. Be sure the source information is entered in "BibTeX" form in the `references.bib` file.
 
