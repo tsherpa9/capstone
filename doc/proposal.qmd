@@ -1,5 +1,5 @@
 ---
-title: "Proposal: Food Accessibility at the County Level"
+title: "Proposal: Food Accessibility at the County-Level"
 subtitle: "DATA 450 Capstone"
 author: "Tenzin Sherpa"
 date: February 5 2023
@@ -12,11 +12,13 @@ jupyter: python3
 
 # Introduction
 
-[This section should contain background and introduction to your general topic.]
+Maintaining a good diet and nutrition makes for our most basic and important needs. Many people, however, do not have easy access to fresh and healthy foods. This comes about due to a lack of grocery stores, food markets, and other food sources near the residence. In countries like America, lack of access to vehicles can also become an obstacle to food accessibility. This problem can most adversely affect vulnerable populations like seniors, children, and low-income groups. Although government-funded food assistance programs are available throughout the country, they may not be enough to tackle the problem.   
+
+This project looks at the problem of food accessibility in the U.S. using the dataset made available by the U.S. Department of Agriculture. Many variables such as low access population distribution, food source availability, food insecurity, assistance programs, and socioeconomic factors to find trends and changes in food accessibility between 2010 and 2015. The goal of this project is to analyze food environment factors and get evidence-based insight into the issue of food accessibility.
 
 # Dataset
 
-The project will use the Food Environment Atlas Data from 9/10/2020 found [here](https://www.ers.usda.gov/data-products/food-environment-atlas/data-access-and-documentation-downloads/). The dataset has been compiled by the US Department of Agriculture (USDA) Economic Research Service (ERS) for purposes of studying factors that affect food choices and the accessibility to healthy foods in communities. The dataset contains county-level information on food environment factors such as access to grocery stores/supermarkets/restaurants, local food sales, food prices, food assistance programs like SNAP (Supplemental Nutrition Assistance Program), National School Lunch Program, etc., socioeconomic characteristics, and some health/physical activities. State-level information on food taxes, and household food insecurity are also available. More extensive documentation on each variable can be found [here](https://www.ers.usda.gov/data-products/food-environment-atlas/documentation/#insecurity).
+The project will use the Food Environment Atlas Data from 9/10/2020 found [here](https://www.ers.usda.gov/data-products/food-environment-atlas/data-access-and-documentation-downloads/) [@dataset]. The dataset has been compiled by the US Department of Agriculture (USDA) Economic Research Service (ERS) for purposes of studying factors that affect food choices and the accessibility to healthy foods in communities. The dataset contains county-level information on food environment factors such as access to grocery stores/supermarkets/restaurants, local food sales, food prices, food assistance programs like SNAP (Supplemental Nutrition Assistance Program), National School Lunch Program, etc., socioeconomic characteristics, and some health/physical activities. State-level information on food taxes, and household food insecurity are also available. More extensive documentation on each variable can be found on the webpage's documentation section.
 
 The dataset has been compiled using various reports from the USDA, the Bureau of the Census, the U.S. Department of Commerce, and more. Some variable values, like those from the 2010 census, were measured directly while others were estimates calculated in the source reports. The data cover the years 2006 to 2019 as separate reports published over a decade were used to create this dataset. However, the focus of the dataset is on the years 2010 and 2015. Hence, this project will also work on analysis relevant to these years.
 
@@ -170,10 +172,6 @@ I will compare the low access percent population with the percent population rec
 *Final Presentations during final exam slot, Monday May 9th 3:20-6:40pm.* 
 
 
-Here's an example of citing a source [see @phil99, pp. 33-35]. Be sure the source information is entered in "BibTeX" form in the `references.bib` file.
+<!-- Here's an example of citing a source [see @phil99, pp. 33-35] -->
 
 # References
-
-[The bibliography will automatically get generated. Any sources you
-cite in the document will be included. Other entries in the `.bib` file
-will not be included.]
