@@ -10,3 +10,4 @@ dependencies:
 - statsmodels
 - flake8
 - tinytex
+- seaborn
