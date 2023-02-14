@@ -12,13 +12,13 @@ jupyter: python3
 
 # Introduction
 
-Maintaining a good diet and nutrition makes for our most basic and important needs. Many people, however, do not have easy access to fresh and healthy foods. This comes about due to a lack of grocery stores, food markets, and other food sources near the residence. In countries like America, lack of access to vehicles can also become an obstacle to food accessibility. This problem can most adversely affect vulnerable populations like seniors, children, and low-income groups. Although government-funded food assistance programs are available throughout the country, they may not be enough to tackle the problem.   
+Maintaining a good diet and nutrition makes for our most basic and important needs. Many people, however, do not have easy access to fresh and healthy foods. This comes about due to a lack of grocery stores, food markets, and other food sources near the residence. This problem can most adversely affect vulnerable populations like seniors, children, and low-income groups. Although government-funded food assistance programs are available throughout the country, they may not be enough to tackle the problem.   
 
-This project looks at the problem of food accessibility in the U.S. using the dataset made available by the U.S. Department of Agriculture. Many variables such as low access population distribution, food source availability, food insecurity, assistance programs, and socioeconomic factors to find trends and changes in food accessibility between 2010 and 2015. The goal of this project is to analyze food environment factors and get evidence-based insight into the issue of food accessibility.
+This project looks at the problem of food accessibility in the U.S. using the dataset made available by the U.S. Department of Agriculture. Many variables such as low access population distribution, food source availability, food insecurity, assistance programs, and socioeconomic factors will be examined to find trends and changes in food accessibility between 2010 and 2015. The goal of this project is to analyze the effect of food environment factors on food accessibility.
 
 # Dataset
 
-The project will use the Food Environment Atlas Data from 9/10/2020 found [here](https://www.ers.usda.gov/data-products/food-environment-atlas/data-access-and-documentation-downloads/) [@dataset]. The dataset has been compiled by the US Department of Agriculture (USDA) Economic Research Service (ERS) for purposes of studying factors that affect food choices and the accessibility to healthy foods in communities. The dataset contains county-level information on food environment factors such as access to grocery stores/supermarkets/restaurants, local food sales, food prices, food assistance programs like SNAP (Supplemental Nutrition Assistance Program), National School Lunch Program, etc., socioeconomic characteristics, and some health/physical activities. State-level information on food taxes, and household food insecurity are also available. More extensive documentation on each variable can be found on the webpage's documentation section.
+The project will use the Food Environment Atlas Data from 9/10/2020 found [here](https://www.ers.usda.gov/data-products/food-environment-atlas/data-access-and-documentation-downloads/) [@dataset]. The dataset has been compiled by the US Department of Agriculture (USDA) Economic Research Service (ERS) for purposes of studying factors that affect food choices and the accessibility of healthy foods in communities. The dataset contains county-level information on food environment factors such as access to grocery stores/supermarkets/restaurants, local food sales, food prices, food assistance programs like SNAP (Supplemental Nutrition Assistance Program), National School Lunch Program, etc., socioeconomic characteristics, and some health/physical activities. State-level information on food taxes, and household food insecurity are also available. More extensive documentation on each variable can be found on the webpage's documentation section.
 
 The dataset has been compiled using various reports from the USDA, the Bureau of the Census, the U.S. Department of Commerce, and more. Some variable values, like those from the 2010 census, were measured directly while others were estimates calculated in the source reports. The data cover the years 2006 to 2019 as separate reports published over a decade were used to create this dataset. However, the focus of the dataset is on the years 2010 and 2015. Hence, this project will also work on analysis relevant to these years.
 
@@ -60,6 +60,7 @@ Some of the variables that are of interest to this project are listed below. The
 * Socioeconomic characteristics
   + 2010 Percentage of the county resident population that is White, Black, Hispanic, Asian, Hawaiian or Pacific Islander, 65 years or older, under 18
   + Median household income, poverty rate, and child poverty rates in 2015
+  + Metro/non-metro county (labels for whether the county is metropolitan or non-metropolitan)
 
 # Data Acquisition and Processing
 
@@ -71,30 +72,33 @@ Addtionally, the dataset holds data in multiple spreadsheets. An important task 
 
 # Research Questions and Methodology
 
-1) Which counties have the lowest accessibility to stores? Are they concentrated in certain cities/regions/states? (5 hours)   
-I will investigate this question by creating a heatmap of low accessibility populations in the counties. The variables that give the percentage of the population considered to have low access will be useful for charting this. I will create separate heatmaps for the years 2010 and 2015. In the heatmaps, a darker shade of color would indicate a higher percentage of the population with low access to food, meaning these areas would have a greater problem with food accessibility.   
+1) Which counties have the lowest accessibility to stores? Are they concentrated in certain cities/regions/states? (6 hours)   
+I will investigate this question by creating a geographical heatmap of low accessibility populations in the counties. The variables that give the percentage of the population considered to have low access will be useful for charting this. I will create separate heatmaps for the years 2010 and 2015. In the heatmaps, a darker shade of color would indicate a higher percentage of the population with low access to food, meaning these areas would have a greater problem with food accessibility.   
 Additionally, I will work on how to filter for counties with low access to food. This categorization may help scale down the problem and focus on areas that need the most help.
 
-2) What demographic is affected the most in low accessibility regions? (5 hours)   
-After identifying counties with greater issues of food accessibility, I will explore the demographics of the population. To look at the overall picture, I will find the average percentage of people under different categories (race, age, income) that have low access. For example, I will use the average of % seniors with low access from different counties. A table or bar plot may be useful to communicate the findings.   
-For a more detailed analysis, I will create heatmaps of the demographic category facing the lowest accessibility. This may help to understand how low accessibility affects people of different races in selected counties.   
+2) What race and age groups are affected the most by low food accessibility? (6 hours)
+- Race: 
+To understand differences in food accessibility for different race groups, I will create a Racial Disparity Score. I will use the low accessibility population values given as a percentage of the racial group population living in the county. The disparity score will be computed by subtracting these values for the groups that have the highest or the lowest values. To visualize the results, I will use a heatmap on a geographical map of the U.S.; the darker shades would represent higher disparities and vice versa. Additionally, I will find the average of the population % with low accessibility for each group. A bar plot can be used to visualize this national statistic.    
+I will also store which race groups had the lowest and highest accessibility for each county. I will create a grouped bar plot to show the number of times a race group appears to have the best or the worst accessibility. For each group, there will be two bars counting the number of times the group had the lowest and the highest accessibility.  
+Lastly, I will also use the above-mentioned strategies after aggregating data based on states or custom territories.  
 
-3) Does the availability of vehicles drastically change the food insecurity level? (1 hour)    
-For this question, I will use pie charts to see what percentage of people with low access have cars.   
+- Age: 
+First, I will look at the average low accessibility population percentages for elders and children. I will also create geographical heatmaps for the two variables to check if some counties have low food accessibility. I will compare it to the graphs for Question 1 to identify if these groups are especially worse off in some counties. Furthermore, I will create two variables that measure the difference between the overall population % with low access and the population % values for elders and age. Using summary statistics and creating a boxplot/distribution plot for the difference scores may help with investigating if there are large differences which would suggest that seniors/children face greater challenges in some counties
+
+3) How does food insecurity level compare with the availability of vehicles? (1 hour)    
+For this question, I will find the average % of households with vehicles separately for metropolitan and non-metropolitan counties. To compare with the low accessibility population, I will create a side-by-side bar plot of the average population % values. 
   
-4) What is the distribution of stores, restaurants, local sources, and assistance programs? (4 hours)   
-I will illustrate this with a heatmap where low access areas will be represented by boundaries while colors represent the density of stores and other food sources there. 
-
-5) How much has food insecurity changed in states? (1 hour)    
+4) How much has food insecurity changed in states? (1 hour)    
 I will select counties that had some of the lowest and highest population percentages with low access to food, and create a table that records the percentage change in food security from 2010 to 2015.
 
-6) What is the relationship between income and food access? (2 hours)   
+5) What is the relationship between income and food access? (2 hours)   
 I will use a scatterplot of the median household income and low access percent population for different counties to investigate any trends.  
 
-7) How is the type of store available related to accessibility? How are the demographic & socioeconomic characteristics of the population and food access in the county connected? (6 hours)   
-I will use a clustering method to answer this question. Before applying a clustering algorithm, I will create sub-dataframes with only selected columns. For instance, to answer the first question, I will use the low-access population percentages along with different store types. 
+6) How is the type of store available related to accessibility? How are the demographic & socioeconomic characteristics of the population and food access in the county connected? (6 hours)   
+I will use linear regression that will try to explain the low accessibility population percentages in a county using food environment variables such as demographic & socioeconomic characteristics dominant in that county. I will also explore other machine-learning models and approaches for this problem.  
+Additionally, I will use these models to investigate the relationship between the type and number of stores available in the county, and the demographic & socioeconomic characteristics information for that county. 
 
-8) Do food assistance programs strongly benefit counties with low food access? (5 hours)     
+7) Do food assistance programs strongly benefit counties with low food access? (4 hours)     
 I will compare the low access percent population with the percent population receiving benefits using a scatterplot.   
 
 # Work plan
@@ -103,32 +107,32 @@ I will compare the low access percent population with the percent population rec
 
 * Data tidying and transforming (4 hours)
 
-* Question 1 (5 hours)
+* Question 1 (3 hours)
 
 
 **Week 5 (2/13 - 2/19):**
 
-* Question 2 (5 hours)
+* Question 1 (3 hours)
 
-* Question 3 (1 hour)
-
-* Question 5 (1 hour)
-
-* Question 4 (2 hours)
+* Question 2 (6 hours)
 
 
 **Week 6 (2/20 - 2/26):**
 
-* Question 4 (2 hours)
+* Question 3 (1 hour)
 
-* Question 7 (6 hours)
+* Question 4 (1 hour)
+
+* Question 5 (2 hours)
+
+* Question 6 (4) hours)
 
 
 **Week 7 (2/27 - 3/5):**
 
-* Question 8 (5 hours)
+* Question 6 (1 hour)
 
-* Question 6 (2 hours)
+* Question 7 (4 hours)
 
 * Presentation prep and practice (4 hours)
 
