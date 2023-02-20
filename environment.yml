@@ -1,4 +1,4 @@
-name: capstone
+name: capstone2
 dependencies:
 - python=3
 - jupyter
@@ -9,5 +9,6 @@ dependencies:
 - scikit-learn
 - statsmodels
 - flake8
-- tinytex
 - seaborn
+- geopandas
+- xlrd
