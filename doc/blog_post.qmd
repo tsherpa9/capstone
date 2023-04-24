@@ -6,7 +6,7 @@ number-sections: false
 format:
   html:
     theme: default
-    rendering: embed-resources
+    rendering: default
     code-fold: true
     code-tools: true
   pdf: default
@@ -16,7 +16,7 @@ jupyter: python3
 # The Issue
 
 Maintaining a healthy and consistent diet makes for our most basic and important needs. Access to food sources, however, may be limited for many people, leading to issues of food insecurity. In 2010, 14.5% (17.2 million households) in the U.S. were food insecure, 5.4% of which had very low food security [1].  
-*“Where’s my next meal going to come from?”*  
+ <p style="text-align: center;">*“Where’s my next meal going to come from?”*</p> 
 
 A potential factor that plays a role in determining whether households have a good and consistent supply of nutritious food may be their accessibility to food. Food accessibility is associated with the proximity to grocery stores, food markets, and other food sources. This project looks at the scope of food accessibility for households in different counties. The project also covers the effect of food environment factors such as income, population demographics, and the availability of nutrition programs on food accessibility and food insecurity.  
 
@@ -52,22 +52,22 @@ To gauge the level of food accessibility in counties, the dataset provides the p
 #| label: fig-accessdist10
 #| fig-cap: "Distribution of County % Population with Low Food Accessibility"
 
-# import pandas as pd
-# import numpy as np
-# import matplotlib.pyplot as plt
-# import seaborn as sns
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
 
-# df = pd.read_pickle(r'./../data/AtlasCleaned.pkl')
+df = pd.read_pickle(r'./../data/AtlasCleaned.pkl')
 
-# sns.set(style='darkgrid')
-# def plt_dis(c):
-#     f = sns.displot(data=df, x=c, height=4, aspect=10/8.27, bins=20)
-#     plt.xlim([0, 100])
-#     plt.ylabel("Number of Counties", alpha=0.8)
-#     plt.xlabel("Low Food Access Pop. %", alpha=0.8)
-#     plt.show()
+sns.set(style='darkgrid')
+def plt_dis(c):
+    f = sns.displot(data=df, x=c, height=4, aspect=10/8.27, bins=20)
+    plt.xlim([0, 100])
+    plt.ylabel("Number of Counties", alpha=0.8)
+    plt.xlabel("Low Food Access Pop. %", alpha=0.8)
+    plt.show()
 
-# plt_dis('PCT_LACCESS_POP10')
+plt_dis('PCT_LACCESS_POP10')
 ```
 
 The distribution of the variable reflects an interesting characteristic of food accessibility in the U.S. The two distinct modes of the distrubution suggests that counties can fall under two distint groups of low and very low accessibility. For majority of the counties, <40% of the population has low food accessibility, while, for around 130 counties, the entire population has low accessibility to food sources.
@@ -78,29 +78,29 @@ The distribution of the variable reflects an interesting characteristic of food 
 #| label: fig-map10
 #| fig-cap: "Low Food Accessibility Population Percentages in 2010"
 
-# import geopandas as gpd
-# import plotly.express as px
-# import plotly.io as pio
-# import pandas as pd
-# import numpy as np
-# import matplotlib.pyplot as plt
-# import seaborn as sns
+import geopandas as gpd
+import plotly.express as px
+import plotly.io as pio
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
 
-# df = pd.read_pickle(r'./../data/AtlasCleaned.pkl')
+df = pd.read_pickle(r'./../data/AtlasCleaned.pkl')
 
-# import json
-# with open(r'./../src/USA_Counties_(Generalized).geojson') as f:
-#     tract = json.load(f)
+import json
+with open(r'./../src/USA_Counties_(Generalized).geojson') as f:
+    tract = json.load(f)
 
-# def plot_chlpth(df, x, label, header):
-#   fig = px.choropleth(df, locations='FIPS', color=x, color_continuous_scale="Viridis",
-#                         range_color=(0, 100), geojson=tract, featureidkey = "properties.FIPS",
-#                         scope="usa", hover_data=['State', 'County'],
-#                         labels=label, title=header)
-#   fig.update_layout(legend=dict(orientation="h", yanchor="top",y=1.02,xanchor="right",x=1))
-#   fig.show()
+def plot_chlpth(df, x, label, header):
+  fig = px.choropleth(df, locations='FIPS', color=x, color_continuous_scale="Viridis",
+                        range_color=(0, 100), geojson=tract, featureidkey = "properties.FIPS",
+                        scope="usa", hover_data=['State', 'County'],
+                        labels=label, title=header)
+  fig.update_layout(legend=dict(orientation="h", yanchor="top",y=1.02,xanchor="right",x=1))
+  fig.show()
 
-# plot_chlpth(df, 'PCT_LACCESS_POP10', {'PCT_LACCESS_POP10':'Popn. %'}, None)
+plot_chlpth(df, 'PCT_LACCESS_POP10', {'PCT_LACCESS_POP10':'Popn. %'}, None)
 ```
 
 The chloropeth shows that low accesiblity counties are concentrated in the Midwest, Southwest and West regions of the country. Since food accessbility is defined on the basis of proximity of households to food stores, the location of the low access countries may be dependent on the housing and geographic conditions. 
@@ -111,14 +111,14 @@ The chloropeth shows that low accesiblity counties are concentrated in the Midwe
 #| label: fig-car10
 #| fig-cap: "Low Food Access Population and Household Vehicle Availability"
 
-# def plt_dis(c):
-#     f = sns.displot(data=df, x=c, y='PCT_LACCESS_POP10', height=4, aspect=10/8.27, bins=10)
-#     plt.xlim([-5, 100])
-#     plt.ylabel("Low Food Access Pop. %", alpha=0.9)
-#     plt.xlabel("Household % with Low Food Access & No Vehicle", alpha=0.8)
-#     plt.show()
+def plt_dis(c):
+    f = sns.displot(data=df, x=c, y='PCT_LACCESS_POP10', height=4, aspect=10/8.27, bins=10)
+    plt.xlim([-5, 100])
+    plt.ylabel("Low Food Access Pop. %", alpha=0.9)
+    plt.xlabel("Household % with Low Food Access & No Vehicle", alpha=0.8)
+    plt.show()
 
-# plt_dis('PCT_LACCESS_HHNV10')
+plt_dis('PCT_LACCESS_HHNV10')
 ```
 
 The density plot of household vehicle availability and county food accessibility helps to show the extent of the food insecurity in the country. The blocks farther away from the axes represent the areas where both food accessibility and vehicle availability for the population is low. These counties are likely to have the 
@@ -133,14 +133,14 @@ For other counties, although food accessibility is bad, most households are indi
 #| label: fig-income10
 #| fig-cap: "Low Food Access Population and Household Vehicle Availability"
 
-# sns.set(color_codes=True)
-# f, ax = plt.subplots(figsize=(8, 8))
-# sns.scatterplot(data=df, x='PCT_LACCESS_POP10', y='PCT_LACCESS_LOWI10')
-# ax.set_ylabel("County Population % with Low Access and Low Income", size = 12, alpha=0.9)
-# ax.set_xlabel("County Population % with Low Food Access",size = 12, alpha=0.9)
-# ax.tick_params(axis='both', which='major', labelsize=14)
-# plt.xlim([0, 100])
-# f.show()
+sns.set(color_codes=True)
+f, ax = plt.subplots(figsize=(8, 8))
+sns.scatterplot(data=df, x='PCT_LACCESS_POP10', y='PCT_LACCESS_LOWI10')
+ax.set_ylabel("County Population % with Low Access and Low Income", size = 12, alpha=0.9)
+ax.set_xlabel("County Population % with Low Food Access",size = 12, alpha=0.9)
+ax.tick_params(axis='both', which='major', labelsize=14)
+plt.xlim([0, 102])
+f.show()
 ```
 
 The scatter plot is of the populaitons with low food accessibility and populations with both low income and low food access. The graph again points the presence of two groups of low and very low food access. For counties with bad food accessibility, the proportion of the population having low access and low income is greater and more varied.
