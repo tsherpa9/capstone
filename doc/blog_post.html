@@ -98,7 +98,6 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <link href="blog_post_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="blog_post_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
 
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
 </head>
 
@@ -111,7 +110,6 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
 <div class="quarto-title-block"><div><h1 class="title">Food Accessibility in U.S. Counties</h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
-<p class="subtitle lead">Spring 2023</p>
 </div>
 
 
@@ -135,22 +133,136 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <section id="the-issue" class="level1">
 <h1>The Issue</h1>
 <p>Maintaining a healthy and consistent diet makes for our most basic and important needs. Access to food sources, however, may be limited for many people, leading to issues of food insecurity. In 2010, 14.5% (17.2 million households) in the U.S. were food insecure, 5.4% of which had very low food security [1].<br>
-<em>“Where’s my next meal going to come from?”</em><br>
-A potential factor that plays a role in determining whether households have a good and consistent supply of nutritious food may be their accessibility to food. Food accessibility is associated with the proximity to grocery stores, food markets, and other food sources. This project looks at the scope of food accessibility for households in different counties. The project also covers the effect of food environment factors such as income, population demographics, and the availability of nutrition programs on food accessibility and food insecurity.</p>
+<em>“Where’s my next meal going to come from?”</em></p>
+<p>A potential factor that plays a role in determining whether households have a good and consistent supply of nutritious food may be their accessibility to food. Food accessibility is associated with the proximity to grocery stores, food markets, and other food sources. This project looks at the scope of food accessibility for households in different counties. The project also covers the effect of food environment factors such as income, population demographics, and the availability of nutrition programs on food accessibility and food insecurity.</p>
 </section>
 <section id="data" class="level1">
 <h1>Data</h1>
-<p>The project uses the Food Environment Atlas Data from 9/10/2020 (Economic Research Service, n.d.). The dataset has been compiled by the US Department of Agriculture (USDA) Economic Research Service (ERS) for the purposes of studying factors that affect food choices and the accessibility of healthy foods in communities. The information in the dataset had been aggregated from various reports from the USDA, the Bureau of the Census, the U.S. Department of Commerce, and more for the years 2006 to 2019. Food accesibility population data, which is the focus of the project, were given for 2010 and 2015.<br>
-The dataset contains county-level information on food environment factors such as access to grocery stores/supermarkets/restaurants, local food sales, food prices, food assistance programs like SNAP (Supplemental Nutrition Assistance Program), National School Lunch Program, etc., socioeconomic characteristics, and some health/physical activities. State-level information on household food insecurity are also given.</p>
-<section id="cleaning" class="level2">
-<h2 class="anchored" data-anchor-id="cleaning">Cleaning</h2>
+<p>The project uses the Food Environment Atlas Data from 9/10/2020 (Economic Research Service, n.d.). The dataset has been compiled by the US Department of Agriculture (USDA) Economic Research Service (ERS) for the purposes of studying factors that affect food choices and the accessibility of healthy foods in communities. The information in the dataset had been aggregated from various reports from the USDA, the Bureau of the Census, the U.S. Department of Commerce, and more for the years 2006 to 2019. Food accesibility population data, which is the focus of the project, were given for 2010 and 2015.</p>
+<p>The dataset contains county-level information on food environment factors such as access to grocery stores/supermarkets/restaurants, local food sales, food prices, food assistance programs like SNAP (Supplemental Nutrition Assistance Program), National School Lunch Program, etc., socioeconomic characteristics, and some health/physical activities. State-level information on household food insecurity are also given. The dataset contained data on 3143 counties, each uniquely identified with their FIPS code.</p>
+<p>To enable geographic visualizations and analysis, an additional file from the ArcGis Hub containing geographic boundary shapes is used.</p>
+<section id="data-preprocessing" class="level2">
+<h2 class="anchored" data-anchor-id="data-preprocessing">Data preprocessing</h2>
+<p>The information in the dataset was stored in separte worksheets, grouped according to the category of the features. Since there was a large number of featurs, the first step was to perform feature reduction. This was done by manually selecting the features that were related to the project’s questions and goals. Features that contained very granular information were also omitted in order to simplify analysis as well as to obtain more generalized insights.</p>
+<p>The dataset and boundary shape file were also compared to check if county FIPS code and names matched for all observations. From 2010 to 2015, there had been changes to some of the county names and FIPS codes which caused discrepancies between the two datsets. These couties were identified and modified to reflect the changes and match all observations. This brought the number of observations from 3143 to 3142 counties.</p>
+<p>For columns with low number of missing values, imputation was done using the median of those features. HTis was done while looking at variable distributions to ensure that imputation does not significantly change their distributions. However, median imputation was not appropriate for some 2015 variables that had larager number of missing values. For these variables, missing values were replaced with numbers from the correponding feature for 2010.</p>
+<p>Overall, the data preprocessing involved merging data, selecting relevant variables, and imputing missing values while exploring the nature of the variables. The cleaned dataset was then saved to a new file that is used for analysis.</p>
 </section>
 </section>
 <section id="insights-from-visualization" class="level1">
 <h1>Insights from Visualization</h1>
+<p>Using the cleaned dataset, some variables of interest were explored by producing visualizations.</p>
+<section id="food-accessibility-in-counties" class="level3">
+<h3 class="anchored" data-anchor-id="food-accessibility-in-counties">Food accessibility in Counties</h3>
+<p>To gauge the level of food accessibility in counties, the dataset provides the percentage of population with low food accessibility. For this dataset, low accessibility population are considered to be those “living more than 1 mile from a supermarket or large grocery store if in an urban area, or more than 10 miles from a supermarket or large grocery store if in a rural area” [2].</p>
+<div id="fig-accessdist10" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># import pandas as pd</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># import numpy as np</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># import matplotlib.pyplot as plt</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># import seaborn as sns</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"># df = pd.read_pickle(r'./../data/AtlasCleaned.pkl')</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co"># sns.set(style='darkgrid')</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co"># def plt_dis(c):</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co">#     f = sns.displot(data=df, x=c, height=4, aspect=10/8.27, bins=20)</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co">#     plt.xlim([0, 100])</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co">#     plt.ylabel("Number of Counties", alpha=0.8)</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co">#     plt.xlabel("Low Food Access Pop. %", alpha=0.8)</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="co">#     plt.show()</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="co"># plt_dis('PCT_LACCESS_POP10')</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<p></p><figcaption class="figure-caption">Figure&nbsp;1: <strong>?(caption)</strong></figcaption><p></p>
+</figure>
+</div>
+<p>The distribution of the variable reflects an interesting characteristic of food accessibility in the U.S. The two distinct modes of the distrubution suggests that counties can fall under two distint groups of low and very low accessibility. For majority of the counties, &lt;40% of the population has low food accessibility, while, for around 130 counties, the entire population has low accessibility to food sources.</p>
+<p><strong>Geographic Visualization of Food Accessibility</strong></p>
+<div id="fig-map10" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># import geopandas as gpd</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co"># import plotly.express as px</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># import plotly.io as pio</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># import pandas as pd</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co"># import numpy as np</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co"># import matplotlib.pyplot as plt</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co"># import seaborn as sns</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co"># df = pd.read_pickle(r'./../data/AtlasCleaned.pkl')</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="co"># import json</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="co"># with open(r'./../src/USA_Counties_(Generalized).geojson') as f:</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="co">#     tract = json.load(f)</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="co"># def plot_chlpth(df, x, label, header):</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="co">#   fig = px.choropleth(df, locations='FIPS', color=x, color_continuous_scale="Viridis",</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="co">#                         range_color=(0, 100), geojson=tract, featureidkey = "properties.FIPS",</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="co">#                         scope="usa", hover_data=['State', 'County'],</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="co">#                         labels=label, title=header)</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="co">#   fig.update_layout(legend=dict(orientation="h", yanchor="top",y=1.02,xanchor="right",x=1))</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="co">#   fig.show()</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a><span class="co"># plot_chlpth(df, 'PCT_LACCESS_POP10', {'PCT_LACCESS_POP10':'Popn. %'}, None)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<p></p><figcaption class="figure-caption">Figure&nbsp;2: <strong>?(caption)</strong></figcaption><p></p>
+</figure>
+</div>
+<p>The chloropeth shows that low accesiblity counties are concentrated in the Midwest, Southwest and West regions of the country. Since food accessbility is defined on the basis of proximity of households to food stores, the location of the low access countries may be dependent on the housing and geographic conditions.</p>
+</section>
+<section id="food-accessibility-and-vehicles" class="level3">
+<h3 class="anchored" data-anchor-id="food-accessibility-and-vehicles">Food Accessibility and Vehicles</h3>
+<div id="fig-car10" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># def plt_dis(c):</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co">#     f = sns.displot(data=df, x=c, y='PCT_LACCESS_POP10', height=4, aspect=10/8.27, bins=10)</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co">#     plt.xlim([-5, 100])</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co">#     plt.ylabel("Low Food Access Pop. %", alpha=0.9)</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co">#     plt.xlabel("Household % with Low Food Access &amp; No Vehicle", alpha=0.8)</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co">#     plt.show()</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="co"># plt_dis('PCT_LACCESS_HHNV10')</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<p></p><figcaption class="figure-caption">Figure&nbsp;3: <strong>?(caption)</strong></figcaption><p></p>
+</figure>
+</div>
+<p>The density plot of household vehicle availability and county food accessibility helps to show the extent of the food insecurity in the country. The blocks farther away from the axes represent the areas where both food accessibility and vehicle availability for the population is low. These counties are likely to have the biggest challenges of food accessibility.</p>
+<p>For other counties, although food accessibility is bad, most households are indicated to have access to vehicles that help to lower the access to food stores. For most counties, under 10% of the households have low access to food and no vehicles.</p>
+</section>
+<section id="food-accessibility-and-income" class="level3">
+<h3 class="anchored" data-anchor-id="food-accessibility-and-income">Food Accessibility and Income</h3>
+<div id="fig-income10" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># sns.set(color_codes=True)</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co"># f, ax = plt.subplots(figsize=(8, 8))</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co"># sns.scatterplot(data=df, x='PCT_LACCESS_POP10', y='PCT_LACCESS_LOWI10')</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co"># ax.set_ylabel("County Population % with Low Access and Low Income", size = 12, alpha=0.9)</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="co"># ax.set_xlabel("County Population % with Low Food Access",size = 12, alpha=0.9)</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="co"># ax.tick_params(axis='both', which='major', labelsize=14)</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co"># plt.xlim([0, 100])</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="co"># f.show()</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<p></p><figcaption class="figure-caption">Figure&nbsp;4: <strong>?(caption)</strong></figcaption><p></p>
+</figure>
+</div>
+<p>The scatter plot is of the populaitons with low food accessibility and populations with both low income and low food access. The graph again points the presence of two groups of low and very low food access. For counties with bad food accessibility, the proportion of the population having low access and low income is greater and more varied.</p>
+</section>
+<section id="demographic" class="level3">
+<h3 class="anchored" data-anchor-id="demographic">Demographic</h3>
+<p>In counties where &gt;80% of the population has low food accessibility, the majority of the population is white, followed by Hispanic and American Indian / Alaska Native.</p>
+</section>
 </section>
 <section id="models" class="level1">
 <h1>Models</h1>
+<p>regression to model insecurity</p>
 </section>
 <section id="results" class="level1">
 <h1>Results</h1>
@@ -160,38 +272,6 @@ The dataset contains county-level information on food environment factors such a
 </section>
 <section id="conlusion" class="level1">
 <h1>Conlusion</h1>
-<p>Welcome to <em>my</em> <del>super</del> SUPER awesome <code>blog</code> post! <span class="math display">\[x^2 = 1\]</span></p>
-<p>This section was copy/pasted from various parts of the <a href="https://quarto.org/docs/get-started/hello/vscode.html">Quarto website</a>.</p>
-<div class="callout-note callout callout-style-default callout-captioned">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-caption-container flex-fill">
-Note
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>Note that there are five types of callouts, including: <code>note</code>, <code>tip</code>, <code>warning</code>, <code>caution</code>, and <code>important</code>.</p>
-</div>
-</div>
-<div class="callout-tip callout callout-style-default callout-captioned">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-caption-container flex-fill">
-Tip With Caption
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>This is an example of a callout with a caption.</p>
-</div>
-</div>
-<p>For your reference, here’s an example of a Python code cell in Quarto, along with a figure that gets generated, along with a caption and a label so that it can be referred to automatically as “Figure 1” (or whatever) in the writeup.</p>
-<p>For a demonstration of a line plot on a polar axis, see <strong>?@fig-polar</strong>.</p>
-<p>Here’s an example of citing a source <span class="citation" data-cites="phil99">(see <a href="#ref-phil99" role="doc-biblioref"><strong>phil99?</strong></a>)</span>. Be sure the source information is entered in “BibTeX” form in the <code>references.bib</code> file.</p>
-<p>The bibliography will automatically get generated. Any sources you cite in the document will be included. Other entries in the <code>.bib</code> file will not be included.</p>
 <!-- -->
 
 </section>
@@ -382,81 +462,169 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
 });
 </script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
-<div class="sourceCode" id="cb1" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Food Accessibility in U.S. Counties"</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="an">subtitle:</span><span class="co"> "Spring 2023"</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="an">author:</span><span class="co"> "Tenzin Sherpa"</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="an">bibliography:</span><span class="co"> references.bib</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="an">number-sections:</span><span class="co"> false</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="an">format:</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co">  html:</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co">    theme: default</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co">    rendering: embed-resources</span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co">    code-fold: true</span></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co">    code-tools: true</span></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co">  pdf: default</span></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="an">jupyter:</span><span class="co"> python3</span></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="fu"># The Issue</span></span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>Maintaining a healthy and consistent diet makes for our most basic and important needs. Access to food sources, however, may be limited for many people, leading to issues of food insecurity. In 2010, 14.5% (17.2 million households) in the U.S. were food insecure, 5.4% of which had very low food security <span class="co">[</span><span class="ot">1</span><span class="co">]</span>.  </span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>*“Where’s my next meal going to come from?”*  </span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>A potential factor that plays a role in determining whether households have a good and consistent supply of nutritious food may be their accessibility to food. Food accessibility is associated with the proximity to grocery stores, food markets, and other food sources. This project looks at the scope of food accessibility for households in different counties. The project also covers the effect of food environment factors such as income, population demographics, and the availability of nutrition programs on food accessibility and food insecurity.  </span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="fu"># Data  </span></span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>The project uses the Food Environment Atlas Data from 9/10/2020 (Economic Research Service, n.d.). The dataset has been compiled by the US Department of Agriculture (USDA) Economic Research Service (ERS) for the purposes of studying factors that affect food choices and the accessibility of healthy foods in communities. The information in the dataset had been aggregated from various reports from the USDA, the Bureau of the Census, the U.S. Department of Commerce, and more for the years 2006 to 2019. Food accesibility population data, which is the focus of the project, were given for 2010 and 2015.   </span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>The dataset contains county-level information on food environment factors such as access to grocery</span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>stores/supermarkets/restaurants, local food sales, food prices, food assistance programs like</span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>SNAP (Supplemental Nutrition Assistance Program), National School Lunch Program, etc.,</span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>socioeconomic characteristics, and some health/physical activities. State-level information on household food insecurity are also given.  </span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a><span class="fu">## Cleaning</span></span>
-<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a><span class="fu"># Insights from Visualization</span></span>
-<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a><span class="fu"># Models </span></span>
-<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a><span class="fu"># Results</span></span>
-<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a><span class="fu"># Discussion </span></span>
-<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a><span class="fu"># Conlusion</span></span>
-<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>Welcome to *my* ~~super~~ SUPER awesome <span class="in">`blog`</span> post!</span>
-<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>$$x^2 = 1$$</span>
-<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>This section was copy/pasted from various parts of the <span class="co">[</span><span class="ot">Quarto website</span><span class="co">](https://quarto.org/docs/get-started/hello/vscode.html)</span>.</span>
-<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>:::{.callout-note}</span>
-<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>Note that there are five types of callouts, including:</span>
-<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a><span class="in">`note`</span>, <span class="in">`tip`</span>, <span class="in">`warning`</span>, <span class="in">`caution`</span>, and <span class="in">`important`</span>.</span>
-<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>:::</span>
-<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>:::{.callout-tip}</span>
-<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a><span class="fu">## Tip With Caption</span></span>
-<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a>This is an example of a callout with a caption.</span>
-<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>:::</span>
-<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a>For your reference, here's an example of a Python code cell in Quarto, along with a figure that gets generated, along with a caption and a label so that it can be referred to automatically as "Figure 1" (or whatever) in the writeup.</span>
-<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a>For a demonstration of a line plot on a polar axis, see @fig-polar.</span>
-<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
-<span id="cb1-69"><a href="#cb1-69" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-polar</span></span>
-<span id="cb1-70"><a href="#cb1-70" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "A line plot on a polar axis"</span></span>
-<span id="cb1-71"><a href="#cb1-71" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-72"><a href="#cb1-72" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb1-73"><a href="#cb1-73" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-74"><a href="#cb1-74" aria-hidden="true" tabindex="-1"></a>Here's an example of citing a source <span class="co">[</span><span class="ot">see @phil99, pp. 33-35</span><span class="co">]</span>. Be sure the source information is entered in "BibTeX" form in the <span class="in">`references.bib`</span> file.</span>
-<span id="cb1-75"><a href="#cb1-75" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-76"><a href="#cb1-76" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-77"><a href="#cb1-77" aria-hidden="true" tabindex="-1"></a>The bibliography will automatically get generated. Any sources you cite in the document will be included. Other entries in the <span class="in">`.bib`</span> file will not be included.</span>
+<div class="sourceCode" id="cb5" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Food Accessibility in U.S. Counties"</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="an">author:</span><span class="co"> "Tenzin Sherpa"</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="an">bibliography:</span><span class="co"> references.bib</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="an">number-sections:</span><span class="co"> false</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="an">format:</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co">  html:</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="co">    theme: default</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="co">    rendering: embed-resources</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="co">    code-fold: true</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="co">    code-tools: true</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="co">  pdf: default</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="an">jupyter:</span><span class="co"> python3</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="fu"># The Issue</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>Maintaining a healthy and consistent diet makes for our most basic and important needs. Access to food sources, however, may be limited for many people, leading to issues of food insecurity. In 2010, 14.5% (17.2 million households) in the U.S. were food insecure, 5.4% of which had very low food security <span class="co">[</span><span class="ot">1</span><span class="co">]</span>.  </span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>*“Where’s my next meal going to come from?”*  </span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>A potential factor that plays a role in determining whether households have a good and consistent supply of nutritious food may be their accessibility to food. Food accessibility is associated with the proximity to grocery stores, food markets, and other food sources. This project looks at the scope of food accessibility for households in different counties. The project also covers the effect of food environment factors such as income, population demographics, and the availability of nutrition programs on food accessibility and food insecurity.  </span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a><span class="fu"># Data  </span></span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>The project uses the Food Environment Atlas Data from 9/10/2020 (Economic Research Service, n.d.). The dataset has been compiled by the US Department of Agriculture (USDA) Economic Research Service (ERS) for the purposes of studying factors that affect food choices and the accessibility of healthy foods in communities. The information in the dataset had been aggregated from various reports from the USDA, the Bureau of the Census, the U.S. Department of Commerce, and more for the years 2006 to 2019. Food accesibility population data, which is the focus of the project, were given for 2010 and 2015.   </span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>The dataset contains county-level information on food environment factors such as access to grocery</span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>stores/supermarkets/restaurants, local food sales, food prices, food assistance programs like</span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>SNAP (Supplemental Nutrition Assistance Program), National School Lunch Program, etc.,</span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>socioeconomic characteristics, and some health/physical activities. State-level information on household food insecurity are also given. The dataset contained data on 3143 counties, each uniquely identified with their FIPS code.</span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>To enable geographic visualizations and analysis, an additional file from the ArcGis Hub containing geographic boundary shapes is used.</span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a><span class="fu">## Data preprocessing</span></span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>The information in the dataset was stored in separte worksheets, grouped according to the category of the features. Since there was a large number of featurs, the first step was to perform feature reduction. This was done by manually selecting the features that were related to the project's questions and goals. Features that contained very granular information were also omitted in order to simplify analysis as well as to obtain more generalized insights.</span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>The dataset and boundary shape file were also compared to check if county FIPS code and names matched for all observations. From 2010 to 2015, there had been changes to some of the county names and FIPS codes which caused discrepancies between the two datsets. These couties were identified and modified to reflect the changes and match all observations. This brought the number of observations from 3143 to 3142 counties. </span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a>For columns with low number of missing values, imputation was done using the median of those features. HTis was done while looking at variable distributions to ensure that imputation does not significantly change their distributions. However, median imputation was not appropriate for some 2015 variables that had larager number of missing values. For these variables, missing values were replaced with numbers from the correponding feature for 2010. </span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>Overall, the data preprocessing involved merging data, selecting relevant variables, and imputing missing values while exploring the nature of the variables. The cleaned dataset was then saved to a new file that is used for analysis.</span>
+<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a><span class="fu"># Insights from Visualization</span></span>
+<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a>Using the cleaned dataset, some variables of interest were explored by producing visualizations. </span>
+<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a><span class="fu">### Food accessibility in Counties </span></span>
+<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a>To gauge the level of food accessibility in counties, the dataset provides the percentage of population with low food accessibility. For this dataset, low accessibility population are considered to be those "living more than 1 mile from a supermarket or large grocery store if in an urban area, or more than 10 miles from a supermarket or large grocery store if in a rural area" <span class="co">[</span><span class="ot">2</span><span class="co">]</span>.  </span>
+<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-53"><a href="#cb5-53" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb5-54"><a href="#cb5-54" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-accessdist10</span></span>
+<span id="cb5-55"><a href="#cb5-55" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Distribution of County % Population with Low Food Accessibility"</span></span>
+<span id="cb5-56"><a href="#cb5-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-57"><a href="#cb5-57" aria-hidden="true" tabindex="-1"></a><span class="co"># import pandas as pd</span></span>
+<span id="cb5-58"><a href="#cb5-58" aria-hidden="true" tabindex="-1"></a><span class="co"># import numpy as np</span></span>
+<span id="cb5-59"><a href="#cb5-59" aria-hidden="true" tabindex="-1"></a><span class="co"># import matplotlib.pyplot as plt</span></span>
+<span id="cb5-60"><a href="#cb5-60" aria-hidden="true" tabindex="-1"></a><span class="co"># import seaborn as sns</span></span>
+<span id="cb5-61"><a href="#cb5-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-62"><a href="#cb5-62" aria-hidden="true" tabindex="-1"></a><span class="co"># df = pd.read_pickle(r'./../data/AtlasCleaned.pkl')</span></span>
+<span id="cb5-63"><a href="#cb5-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-64"><a href="#cb5-64" aria-hidden="true" tabindex="-1"></a><span class="co"># sns.set(style='darkgrid')</span></span>
+<span id="cb5-65"><a href="#cb5-65" aria-hidden="true" tabindex="-1"></a><span class="co"># def plt_dis(c):</span></span>
+<span id="cb5-66"><a href="#cb5-66" aria-hidden="true" tabindex="-1"></a><span class="co">#     f = sns.displot(data=df, x=c, height=4, aspect=10/8.27, bins=20)</span></span>
+<span id="cb5-67"><a href="#cb5-67" aria-hidden="true" tabindex="-1"></a><span class="co">#     plt.xlim([0, 100])</span></span>
+<span id="cb5-68"><a href="#cb5-68" aria-hidden="true" tabindex="-1"></a><span class="co">#     plt.ylabel("Number of Counties", alpha=0.8)</span></span>
+<span id="cb5-69"><a href="#cb5-69" aria-hidden="true" tabindex="-1"></a><span class="co">#     plt.xlabel("Low Food Access Pop. %", alpha=0.8)</span></span>
+<span id="cb5-70"><a href="#cb5-70" aria-hidden="true" tabindex="-1"></a><span class="co">#     plt.show()</span></span>
+<span id="cb5-71"><a href="#cb5-71" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-72"><a href="#cb5-72" aria-hidden="true" tabindex="-1"></a><span class="co"># plt_dis('PCT_LACCESS_POP10')</span></span>
+<span id="cb5-73"><a href="#cb5-73" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb5-74"><a href="#cb5-74" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-75"><a href="#cb5-75" aria-hidden="true" tabindex="-1"></a>The distribution of the variable reflects an interesting characteristic of food accessibility in the U.S. The two distinct modes of the distrubution suggests that counties can fall under two distint groups of low and very low accessibility. For majority of the counties, &lt;40% of the population has low food accessibility, while, for around 130 counties, the entire population has low accessibility to food sources.</span>
+<span id="cb5-76"><a href="#cb5-76" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-77"><a href="#cb5-77" aria-hidden="true" tabindex="-1"></a>**Geographic Visualization of Food Accessibility**</span>
+<span id="cb5-78"><a href="#cb5-78" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-81"><a href="#cb5-81" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb5-82"><a href="#cb5-82" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-map10</span></span>
+<span id="cb5-83"><a href="#cb5-83" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Low Food Accessibility Population Percentages in 2010"</span></span>
+<span id="cb5-84"><a href="#cb5-84" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-85"><a href="#cb5-85" aria-hidden="true" tabindex="-1"></a><span class="co"># import geopandas as gpd</span></span>
+<span id="cb5-86"><a href="#cb5-86" aria-hidden="true" tabindex="-1"></a><span class="co"># import plotly.express as px</span></span>
+<span id="cb5-87"><a href="#cb5-87" aria-hidden="true" tabindex="-1"></a><span class="co"># import plotly.io as pio</span></span>
+<span id="cb5-88"><a href="#cb5-88" aria-hidden="true" tabindex="-1"></a><span class="co"># import pandas as pd</span></span>
+<span id="cb5-89"><a href="#cb5-89" aria-hidden="true" tabindex="-1"></a><span class="co"># import numpy as np</span></span>
+<span id="cb5-90"><a href="#cb5-90" aria-hidden="true" tabindex="-1"></a><span class="co"># import matplotlib.pyplot as plt</span></span>
+<span id="cb5-91"><a href="#cb5-91" aria-hidden="true" tabindex="-1"></a><span class="co"># import seaborn as sns</span></span>
+<span id="cb5-92"><a href="#cb5-92" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-93"><a href="#cb5-93" aria-hidden="true" tabindex="-1"></a><span class="co"># df = pd.read_pickle(r'./../data/AtlasCleaned.pkl')</span></span>
+<span id="cb5-94"><a href="#cb5-94" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-95"><a href="#cb5-95" aria-hidden="true" tabindex="-1"></a><span class="co"># import json</span></span>
+<span id="cb5-96"><a href="#cb5-96" aria-hidden="true" tabindex="-1"></a><span class="co"># with open(r'./../src/USA_Counties_(Generalized).geojson') as f:</span></span>
+<span id="cb5-97"><a href="#cb5-97" aria-hidden="true" tabindex="-1"></a><span class="co">#     tract = json.load(f)</span></span>
+<span id="cb5-98"><a href="#cb5-98" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-99"><a href="#cb5-99" aria-hidden="true" tabindex="-1"></a><span class="co"># def plot_chlpth(df, x, label, header):</span></span>
+<span id="cb5-100"><a href="#cb5-100" aria-hidden="true" tabindex="-1"></a><span class="co">#   fig = px.choropleth(df, locations='FIPS', color=x, color_continuous_scale="Viridis",</span></span>
+<span id="cb5-101"><a href="#cb5-101" aria-hidden="true" tabindex="-1"></a><span class="co">#                         range_color=(0, 100), geojson=tract, featureidkey = "properties.FIPS",</span></span>
+<span id="cb5-102"><a href="#cb5-102" aria-hidden="true" tabindex="-1"></a><span class="co">#                         scope="usa", hover_data=['State', 'County'],</span></span>
+<span id="cb5-103"><a href="#cb5-103" aria-hidden="true" tabindex="-1"></a><span class="co">#                         labels=label, title=header)</span></span>
+<span id="cb5-104"><a href="#cb5-104" aria-hidden="true" tabindex="-1"></a><span class="co">#   fig.update_layout(legend=dict(orientation="h", yanchor="top",y=1.02,xanchor="right",x=1))</span></span>
+<span id="cb5-105"><a href="#cb5-105" aria-hidden="true" tabindex="-1"></a><span class="co">#   fig.show()</span></span>
+<span id="cb5-106"><a href="#cb5-106" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-107"><a href="#cb5-107" aria-hidden="true" tabindex="-1"></a><span class="co"># plot_chlpth(df, 'PCT_LACCESS_POP10', {'PCT_LACCESS_POP10':'Popn. %'}, None)</span></span>
+<span id="cb5-108"><a href="#cb5-108" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb5-109"><a href="#cb5-109" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-110"><a href="#cb5-110" aria-hidden="true" tabindex="-1"></a>The chloropeth shows that low accesiblity counties are concentrated in the Midwest, Southwest and West regions of the country. Since food accessbility is defined on the basis of proximity of households to food stores, the location of the low access countries may be dependent on the housing and geographic conditions. </span>
+<span id="cb5-111"><a href="#cb5-111" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-112"><a href="#cb5-112" aria-hidden="true" tabindex="-1"></a><span class="fu">### Food Accessibility and Vehicles </span></span>
+<span id="cb5-113"><a href="#cb5-113" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-116"><a href="#cb5-116" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb5-117"><a href="#cb5-117" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-car10</span></span>
+<span id="cb5-118"><a href="#cb5-118" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Low Food Access Population and Household Vehicle Availability"</span></span>
+<span id="cb5-119"><a href="#cb5-119" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-120"><a href="#cb5-120" aria-hidden="true" tabindex="-1"></a><span class="co"># def plt_dis(c):</span></span>
+<span id="cb5-121"><a href="#cb5-121" aria-hidden="true" tabindex="-1"></a><span class="co">#     f = sns.displot(data=df, x=c, y='PCT_LACCESS_POP10', height=4, aspect=10/8.27, bins=10)</span></span>
+<span id="cb5-122"><a href="#cb5-122" aria-hidden="true" tabindex="-1"></a><span class="co">#     plt.xlim([-5, 100])</span></span>
+<span id="cb5-123"><a href="#cb5-123" aria-hidden="true" tabindex="-1"></a><span class="co">#     plt.ylabel("Low Food Access Pop. %", alpha=0.9)</span></span>
+<span id="cb5-124"><a href="#cb5-124" aria-hidden="true" tabindex="-1"></a><span class="co">#     plt.xlabel("Household % with Low Food Access &amp; No Vehicle", alpha=0.8)</span></span>
+<span id="cb5-125"><a href="#cb5-125" aria-hidden="true" tabindex="-1"></a><span class="co">#     plt.show()</span></span>
+<span id="cb5-126"><a href="#cb5-126" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-127"><a href="#cb5-127" aria-hidden="true" tabindex="-1"></a><span class="co"># plt_dis('PCT_LACCESS_HHNV10')</span></span>
+<span id="cb5-128"><a href="#cb5-128" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb5-129"><a href="#cb5-129" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-130"><a href="#cb5-130" aria-hidden="true" tabindex="-1"></a>The density plot of household vehicle availability and county food accessibility helps to show the extent of the food insecurity in the country. The blocks farther away from the axes represent the areas where both food accessibility and vehicle availability for the population is low. These counties are likely to have the </span>
+<span id="cb5-131"><a href="#cb5-131" aria-hidden="true" tabindex="-1"></a>biggest challenges of food accessibility. </span>
+<span id="cb5-132"><a href="#cb5-132" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-133"><a href="#cb5-133" aria-hidden="true" tabindex="-1"></a>For other counties, although food accessibility is bad, most households are indicated to have access to vehicles that help to lower the access to food stores. For most counties, under 10% of the households have low access to food and no vehicles.</span>
+<span id="cb5-134"><a href="#cb5-134" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-135"><a href="#cb5-135" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-136"><a href="#cb5-136" aria-hidden="true" tabindex="-1"></a><span class="fu">### Food Accessibility and Income </span></span>
+<span id="cb5-137"><a href="#cb5-137" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-140"><a href="#cb5-140" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb5-141"><a href="#cb5-141" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-income10</span></span>
+<span id="cb5-142"><a href="#cb5-142" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Low Food Access Population and Household Vehicle Availability"</span></span>
+<span id="cb5-143"><a href="#cb5-143" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-144"><a href="#cb5-144" aria-hidden="true" tabindex="-1"></a><span class="co"># sns.set(color_codes=True)</span></span>
+<span id="cb5-145"><a href="#cb5-145" aria-hidden="true" tabindex="-1"></a><span class="co"># f, ax = plt.subplots(figsize=(8, 8))</span></span>
+<span id="cb5-146"><a href="#cb5-146" aria-hidden="true" tabindex="-1"></a><span class="co"># sns.scatterplot(data=df, x='PCT_LACCESS_POP10', y='PCT_LACCESS_LOWI10')</span></span>
+<span id="cb5-147"><a href="#cb5-147" aria-hidden="true" tabindex="-1"></a><span class="co"># ax.set_ylabel("County Population % with Low Access and Low Income", size = 12, alpha=0.9)</span></span>
+<span id="cb5-148"><a href="#cb5-148" aria-hidden="true" tabindex="-1"></a><span class="co"># ax.set_xlabel("County Population % with Low Food Access",size = 12, alpha=0.9)</span></span>
+<span id="cb5-149"><a href="#cb5-149" aria-hidden="true" tabindex="-1"></a><span class="co"># ax.tick_params(axis='both', which='major', labelsize=14)</span></span>
+<span id="cb5-150"><a href="#cb5-150" aria-hidden="true" tabindex="-1"></a><span class="co"># plt.xlim([0, 100])</span></span>
+<span id="cb5-151"><a href="#cb5-151" aria-hidden="true" tabindex="-1"></a><span class="co"># f.show()</span></span>
+<span id="cb5-152"><a href="#cb5-152" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb5-153"><a href="#cb5-153" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-154"><a href="#cb5-154" aria-hidden="true" tabindex="-1"></a>The scatter plot is of the populaitons with low food accessibility and populations with both low income and low food access. The graph again points the presence of two groups of low and very low food access. For counties with bad food accessibility, the proportion of the population having low access and low income is greater and more varied.</span>
+<span id="cb5-155"><a href="#cb5-155" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-156"><a href="#cb5-156" aria-hidden="true" tabindex="-1"></a><span class="fu">### Demographic</span></span>
+<span id="cb5-157"><a href="#cb5-157" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-158"><a href="#cb5-158" aria-hidden="true" tabindex="-1"></a>In counties where &gt;80% of the population has low food accessibility, the majority of the population is white, followed by Hispanic and American Indian / Alaska Native.</span>
+<span id="cb5-159"><a href="#cb5-159" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-160"><a href="#cb5-160" aria-hidden="true" tabindex="-1"></a><span class="fu"># Models </span></span>
+<span id="cb5-161"><a href="#cb5-161" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-162"><a href="#cb5-162" aria-hidden="true" tabindex="-1"></a>regression to model insecurity </span>
+<span id="cb5-163"><a href="#cb5-163" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-164"><a href="#cb5-164" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-165"><a href="#cb5-165" aria-hidden="true" tabindex="-1"></a><span class="fu"># Results</span></span>
+<span id="cb5-166"><a href="#cb5-166" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-167"><a href="#cb5-167" aria-hidden="true" tabindex="-1"></a><span class="fu"># Discussion </span></span>
+<span id="cb5-168"><a href="#cb5-168" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-169"><a href="#cb5-169" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-170"><a href="#cb5-170" aria-hidden="true" tabindex="-1"></a><span class="fu"># Conlusion</span></span>
+<span id="cb5-171"><a href="#cb5-171" aria-hidden="true" tabindex="-1"></a></span>
 </code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
