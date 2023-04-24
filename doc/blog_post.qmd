@@ -1,7 +1,6 @@
 ---
-title: "My awesome blog"
-subtitle: "Spring 2023"
-author: "Prof. Yuster"
+title: "Food Accessibility in U.S. Counties"
+author: "Tenzin Sherpa"
 bibliography: references.bib
 number-sections: false
 format:
@@ -14,12 +13,38 @@ format:
 jupyter: python3
 ---
 
-# Welcome
+# The Issue
 
-**Welcome** to *my* ~~super~~ SUPER awesome `blog` post!
+Maintaining a healthy and consistent diet makes for our most basic and important needs. Access to food sources, however, may be limited for many people, leading to issues of food insecurity. In 2010, 14.5% (17.2 million households) in the U.S. were food insecure, 5.4% of which had very low food security [1].  
+*“Where’s my next meal going to come from?”*  
+
+A potential factor that plays a role in determining whether households have a good and consistent supply of nutritious food may be their accessibility to food. Food accessibility is associated with the proximity to grocery stores, food markets, and other food sources. This project looks at the scope of food accessibility for households in different counties. The project also covers the effect of food environment factors such as income, population demographics, and the availability of nutrition programs on food accessibility and food insecurity.  
+
+# Data  
+The project uses the Food Environment Atlas Data from 9/10/2020 (Economic Research Service, n.d.). The dataset has been compiled by the US Department of Agriculture (USDA) Economic Research Service (ERS) for the purposes of studying factors that affect food choices and the accessibility of healthy foods in communities. The information in the dataset had been aggregated from various reports from the USDA, the Bureau of the Census, the U.S. Department of Commerce, and more for the years 2006 to 2019. Food accesibility population data, which is the focus of the project, were given for 2010 and 2015.   
+
+The dataset contains county-level information on food environment factors such as access to grocery
+stores/supermarkets/restaurants, local food sales, food prices, food assistance programs like
+SNAP (Supplemental Nutrition Assistance Program), National School Lunch Program, etc.,
+socioeconomic characteristics, and some health/physical activities. State-level information on household food insecurity are also given.  
+
+## Cleaning
+
+
+# Insights from Visualization
+
+# Models 
+
+# Results
+
+# Discussion 
+
+
+# Conlusion
+
+Welcome to *my* ~~super~~ SUPER awesome `blog` post!
 $$x^2 = 1$$
 
-## Quarto is cool
 
 This section was copy/pasted from various parts of the [Quarto website](https://quarto.org/docs/get-started/hello/vscode.html).
 
@@ -43,18 +68,6 @@ For a demonstration of a line plot on a polar axis, see @fig-polar.
 #| label: fig-polar
 #| fig-cap: "A line plot on a polar axis"
 
-import numpy as np
-import matplotlib.pyplot as plt
-
-r = np.arange(0, 2, 0.01)
-theta = 2 * np.pi * r
-fig, ax = plt.subplots(
-  subplot_kw = {'projection': 'polar'} 
-)
-ax.plot(theta, r)
-ax.set_rticks([0.5, 1, 1.5, 2])
-ax.grid(True)
-plt.show()
 ```
 
 Here's an example of citing a source [see @phil99, pp. 33-35]. Be sure the source information is entered in "BibTeX" form in the `references.bib` file.
