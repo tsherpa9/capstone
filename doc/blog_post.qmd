@@ -5,48 +5,55 @@ bibliography: references.bib
 number-sections: false
 format:
   html:
-    theme: default
+    theme: flatly
     rendering: default
+    toc: true
+    toc-title: Contents
     code-fold: true
     code-tools: true
+    font-family: Georgia, serif;
   pdf: default
 jupyter: python3
 ---
 
+![](pic.png)
+
 # The Issue
 
 Maintaining a healthy and consistent diet makes for our most basic and important needs. Access to food sources, however, may be limited for many people, leading to issues of food insecurity. In 2010, 14.5% (17.2 million households) in the U.S. were food insecure, 5.4% of which had very low food security [1].  
- <p style="text-align: center;">*“Where’s my next meal going to come from?”*</p> 
+ <p style="text-align: center;">Many are left to ask:  
+ *“Where’s my next meal going to come from?”*</p> 
 
 A potential factor that plays a role in determining whether households have a good and consistent supply of nutritious food may be their accessibility to food. Food accessibility is associated with the proximity to grocery stores, food markets, and other food sources. This project looks at the scope of food accessibility for households in different counties. The project also covers the effect of food environment factors such as income, population demographics, and the availability of nutrition programs on food accessibility and food insecurity.  
 
 # Data  
-The project uses the Food Environment Atlas Data from 9/10/2020 (Economic Research Service, n.d.). The dataset has been compiled by the US Department of Agriculture (USDA) Economic Research Service (ERS) for the purposes of studying factors that affect food choices and the accessibility of healthy foods in communities. The information in the dataset had been aggregated from various reports from the USDA, the Bureau of the Census, the U.S. Department of Commerce, and more for the years 2006 to 2019. Food accesibility population data, which is the focus of the project, were given for 2010 and 2015.   
+The project uses the Food Environment Atlas Data from 9/10/2020 (Economic Research Service, n.d.). The dataset has been compiled by the US Department of Agriculture (USDA) Economic Research Service (ERS) to study factors that affect food choices and the accessibility of healthy foods in communities. The information in the dataset had been aggregated from various reports from the USDA, the Bureau of the Census, the U.S. Department of Commerce, and more for the years 2006 to 2019. Food accessibility population data, which is the focus of the project, were given for 2010 and 2015.   
 
-The dataset contains county-level information on food environment factors such as access to grocery
-stores/supermarkets/restaurants, local food sales, food prices, food assistance programs like
-SNAP (Supplemental Nutrition Assistance Program), National School Lunch Program, etc.,
-socioeconomic characteristics, and some health/physical activities. State-level information on household food insecurity are also given. The dataset contained data on 3143 counties, each uniquely identified with their FIPS code.
+The dataset contains county-level information on food environment factors such as access to grocery stores/supermarkets/restaurants, local food sales, food prices, food assistance programs like SNAP (Supplemental Nutrition Assistance Program), National School Lunch Program, etc., socioeconomic characteristics, and some health/physical activities. State-level information on household food insecurity is also given. The dataset contained data on 3143 counties, each uniquely identified with their FIPS code.
 
-To enable geographic visualizations and analysis, an additional file from the ArcGis Hub containing geographic boundary shapes is used.
+To enable geographic visualizations and analysis, an additional file from the ArcGIS Hub containing geographic boundary shapes is used.
 
-## Data preprocessing
+## Preprocessing
 
-The information in the dataset was stored in separte worksheets, grouped according to the category of the features. Since there was a large number of featurs, the first step was to perform feature reduction. This was done by manually selecting the features that were related to the project's questions and goals. Features that contained very granular information were also omitted in order to simplify analysis as well as to obtain more generalized insights.
+The information in the dataset was stored in separate worksheets, grouped according to the category of the features. Since there was a large number of features, the first step was to perform feature reduction. This was done by manually selecting the features that were related to the project's questions and goals. Features that contained very granular information were also omitted in order to simplify analysis as well as to obtain more generalized insights.
 
-The dataset and boundary shape file were also compared to check if county FIPS code and names matched for all observations. From 2010 to 2015, there had been changes to some of the county names and FIPS codes which caused discrepancies between the two datsets. These couties were identified and modified to reflect the changes and match all observations. This brought the number of observations from 3143 to 3142 counties. 
+The dataset and boundary shape file was also compared to check if county FIPS codes and names matched for all observations. From 2010 to 2015, there had been changes to some of the county names and FIPS codes which caused discrepancies between the two datasets. These counties were identified and modified to reflect the changes and match all observations. This brought the number of observations from 3143 to 3142 counties. 
 
-For columns with low number of missing values, imputation was done using the median of those features. HTis was done while looking at variable distributions to ensure that imputation does not significantly change their distributions. However, median imputation was not appropriate for some 2015 variables that had larager number of missing values. For these variables, missing values were replaced with numbers from the correponding feature for 2010. 
+For columns with a low number of missing values, imputation was done using the median of those features. This was done while looking at variable distributions to ensure that imputation does not significantly change their distributions. However, median imputation was not appropriate for some 2015 variables that had a larger number of missing values. For these variables, missing values were replaced with numbers from the corresponding feature for 2010. 
 
-Overall, the data preprocessing involved merging data, selecting relevant variables, and imputing missing values while exploring the nature of the variables. The cleaned dataset was then saved to a new file that is used for analysis.
+Overall, the data preprocessing involved merging data, selecting relevant variables and imputing missing values while exploring the nature of the variables. The cleaned dataset was then saved to a new file that is used for analysis.
 
-# Insights from Visualization
-
+# Visualizers
 Using the cleaned dataset, some variables of interest were explored by producing visualizations. 
 
-### Food accessibility in Counties 
+### Food Accessibility 
  
-To gauge the level of food accessibility in counties, the dataset provides the percentage of population with low food accessibility. For this dataset, low accessibility population are considered to be those "living more than 1 mile from a supermarket or large grocery store if in an urban area, or more than 10 miles from a supermarket or large grocery store if in a rural area" [2].  
+To gauge the level of food accessibility in counties, the dataset provides the percentage of the population with low food accessibility. For this dataset, low accessibility populations are considered to be those "living more than 1 mile from a supermarket or large grocery store if in an urban area, or more than 10 miles from a supermarket or large grocery store if in a rural area" [2].  
+
+```{python}
+import warnings
+warnings.filterwarnings("ignore")
+```
 
 ```{python}
 #| label: fig-accessdist10
@@ -70,9 +77,9 @@ def plt_dis(c):
 plt_dis('PCT_LACCESS_POP10')
 ```
 
-The distribution of the variable reflects an interesting characteristic of food accessibility in the U.S. The two distinct modes of the distrubution suggests that counties can fall under two distint groups of low and very low accessibility. For majority of the counties, <40% of the population has low food accessibility, while, for around 130 counties, the entire population has low accessibility to food sources.
+The distribution of the variable reflects an interesting characteristic of food accessibility in the U.S. The two distinct modes of distribution suggest that counties can fall under two distinct groups based on the extent of food accessibility. For the majority of the counties, <40% of the population has low food accessibility, while for around 130 counties, the entire population (reaching 100%) has low accessibility to food sources.  
 
-**Geographic Visualization of Food Accessibility**
+**Geographic Visualization**
 
 ```{python}
 #| label: fig-map10
@@ -103,9 +110,11 @@ def plot_chlpth(df, x, label, header):
 plot_chlpth(df, 'PCT_LACCESS_POP10', {'PCT_LACCESS_POP10':'Popn. %'}, None)
 ```
 
-The chloropeth shows that low accesiblity counties are concentrated in the Midwest, Southwest and West regions of the country. Since food accessbility is defined on the basis of proximity of households to food stores, the location of the low access countries may be dependent on the housing and geographic conditions. 
+The choropleth shows that low food accessibility counties are concentrated in the Midwest, Southwest, and West regions of the country. Since food accessibility is defined based on the proximity of households to food stores, the location of the low-access counties could be the product of geographic conditions and living conditions in remote regions.  
 
-### Food Accessibility and Vehicles 
+### Food and Vehicle Access
+
+The dataset measures food accessibility based on the proximity of residential areas to food stores. However, it is important to note that the availability of vehicles can also play a significant role in determining food accessibility. While some populations may live far from stores, having a car or access to transportation can help cover greater distances to purchase food. 
 
 ```{python}
 #| label: fig-car10
@@ -121,43 +130,166 @@ def plt_dis(c):
 plt_dis('PCT_LACCESS_HHNV10')
 ```
 
-The density plot of household vehicle availability and county food accessibility helps to show the extent of the food insecurity in the country. The blocks farther away from the axes represent the areas where both food accessibility and vehicle availability for the population is low. These counties are likely to have the 
-biggest challenges of food accessibility. 
+To take account of this additional variable, we look at the density plot of household vehicle availability and county food accessibility. The blocks farther away from the axes represent the areas where both food accessibility and vehicle availability for the populations living there are low. These counties are likely to have the biggest challenges of food accessibility. 
 
-For other counties, although food accessibility is bad, most households are indicated to have access to vehicles that help to lower the access to food stores. For most counties, under 10% of the households have low access to food and no vehicles.
+In other counties, although food accessibility is bad, most households have access to vehicles (shown by the few dark areas). For most counties, 0-40% have low food accesibility, but only <10% of the households with low food access do not have vehicles. Additionally, the lower percentage of households having vehicles is seen for some of the counties where larger proportion of populations did not have good food access. This could mean that the problem of food accessibility in these counties may be lower than depicted earlier.  
 
+### Income and Food Access
 
-### Food Accessibility and Income 
+Income is another crucial factor that can impact access to food. Low-income groups may be more sensitive to food prices and the lack of food availability in close proximity to their homes. The scatter plot charts the population with low food accessibility and populations with both low income and low food access. Here, low income is defined as "annual family income of less than or equal to 200 percent of the Federal poverty threshold based on family size." [3] 
 
 ```{python}
 #| label: fig-income10
 #| fig-cap: "Low Food Access Population and Household Vehicle Availability"
-
+#| 
 sns.set(color_codes=True)
-f, ax = plt.subplots(figsize=(8, 8))
+f, ax = plt.subplots(figsize=(6, 5))
 sns.scatterplot(data=df, x='PCT_LACCESS_POP10', y='PCT_LACCESS_LOWI10')
 ax.set_ylabel("County Population % with Low Access and Low Income", size = 12, alpha=0.9)
 ax.set_xlabel("County Population % with Low Food Access",size = 12, alpha=0.9)
 ax.tick_params(axis='both', which='major', labelsize=14)
 plt.xlim([0, 102])
+xpoints = ypoints = ax.get_xlim()
+ax.plot(xpoints, ypoints, linestyle='--', color='cornflowerblue', lw=1, scalex=False, scaley=False)
 f.show()
 ```
 
-The scatter plot is of the populaitons with low food accessibility and populations with both low income and low food access. The graph again points the presence of two groups of low and very low food access. For counties with bad food accessibility, the proportion of the population having low access and low income is greater and more varied.
+The plot shows that the data points always fall below the identity function line. So, the proportion of population with both low food access and low incom is less than the population percentage with low food access. This suggests that not whole of the population with low food access have low income (as defined for the datset). However, the plot also shows that counties with worse food access have greater percentages of people with low access and low income. Thus, income can be correlated with food accessibility. Furthermore, the variation in these percentage values increases as accessibility worsens. This is also reminiscent of the variation in household availability for counties with bad food access.
 
-### Demographic
+
+### Demographic Characteristics
 
 In counties where >80% of the population has low food accessibility, the majority of the population is white, followed by Hispanic and American Indian / Alaska Native.
 
-# Models 
+# Features' Relationships
 
-regression to model insecurity 
+Next, we investigate the dependence of some variables in the dataset. First, we look at how food accessibility variables affect food insecurity feature given in the dataset. Second, we look at the presence of food assistance program compared with food accessibility levels. 
+
+### Food Insecurity and Accessibility 
+
+The dataset provides the state-level food insecurity information. Food-insecure are those households that "were unable, at times during the year, to provide adequate food for one or more household members because the household lacked money and other resources for food." [4] The values measuring prevalence food insecurity were given as three-year averages. In the following model, the food insecurity percent average for 2012-2014 are used as response variable for the training set whereas food insecurity percent average for 2015-2017 are used as the response variable for test set.
+
+```{python}
+df_avg = df.drop(labels=['LACCESS_POP10', 'LACCESS_POP15',    'PCH_LACCESS_POP_10_15', 'LACCESS_LOWI10', 'LACCESS_LOWI15',
+                    'PCH_LACCESS_LOWI_10_15', 'LACCESS_HHNV10', 'LACCESS_HHNV15', 'PCH_LACCESS_HHNV_10_15',
+                    'LACCESS_SNAP15', 'LACCESS_CHILD10', 'LACCESS_CHILD15', 'LACCESS_CHILD_10_15', 
+                    'LACCESS_SENIORS10', 'LACCESS_SENIORS15', 'PCH_LACCESS_SENIORS_10_15', 'LACCESS_WHITE15', 
+                    'LACCESS_BLACK15', 'LACCESS_HISP15', 'LACCESS_NHASIAN15', 'LACCESS_NHNA15', 
+                    'LACCESS_NHPI15', 'LACCESS_MULTIR15'], axis=1).groupby(['State']).mean()
+
+df10_cols = ['PCT_LACCESS_POP10', 'PCT_LACCESS_LOWI10', 'PCT_LACCESS_HHNV10',
+             'PCT_LACCESS_CHILD10','PCT_LACCESS_SENIORS10', 'PCT_FREE_LUNCH10', 'PCT_REDUCED_LUNCH10',
+             'PCT_NHWHITE10', 'PCT_NHBLACK10', 'PCT_HISP10', 'PCT_NHASIAN10', 'PCT_NHNA10', 'PCT_NHPI10',
+             'PCT_65OLDER10', 'PCT_18YOUNGER10',
+             'GROCPTH11', 'SUPERCPTH11', 'CONVSPTH11', 'SPECSPTH11', 
+             'SNAPSPTH12', 'FFRPTH11', 'FSRPTH11', 'PC_FFRSALES07','PC_FSRSALES07', 'PCT_SNAP12', 
+             'SNAP_PART_RATE11', 'PCT_NSLP12','PCT_SBP12', 'PCT_SFSP12',
+             'FDPIR12','FOODINSEC_12_14','VLFOODSEC_12_14','DIRSALES_FARMS07', 'FMRKTPTH13']
 
 
-# Results
+df15_cols = ['PCT_LACCESS_POP15', 'PCT_LACCESS_LOWI15', 'PCT_LACCESS_HHNV15', 
+             'PCT_LACCESS_SNAP15', 'PCT_LACCESS_CHILD15', 'PCT_LACCESS_SENIORS15', 'PCT_LACCESS_WHITE15',
+             'PCT_LACCESS_BLACK15','PCT_LACCESS_HISP15', 'PCT_LACCESS_NHASIAN15', 'PCT_LACCESS_NHNA15', 
+             'PCT_LACCESS_NHPI15', 'PCT_LACCESS_MULTIR15', 'PCT_FREE_LUNCH15', 'PCT_REDUCED_LUNCH15', 
+             'GROCPTH16', 'SUPERCPTH16', 'CONVSPTH16', 'SPECSPTH16', 'SNAPSPTH17', 'FFRPTH16', 'FSRPTH16',
+             'PC_FFRSALES12', 'PC_FSRSALES12', 'PCT_SNAP17','SNAP_PART_RATE16', 'PCT_NSLP17', 'PCT_SBP17', 'PCT_SFSP17',
+             'FDPIR15', 'FOODINSEC_15_17','VLFOODSEC_15_17', 'DIRSALES_FARMS12', 'FMRKTPTH18']
 
-# Discussion 
+# Foodhub, metro 13, medhincome 15 'POVRATE15' are not here
 
+df10 = pd.DataFrame(df_avg, columns = df10_cols)
+df15 = pd.DataFrame(df_avg, columns = df15_cols)
+
+from sklearn.preprocessing import MinMaxScaler
+scaler = MinMaxScaler()
+
+df10 = pd.DataFrame(scaler.fit_transform(df10), columns=df10.columns)
+df15 = pd.DataFrame(scaler.fit_transform(df15), columns=df15.columns)
+
+df10.rename(columns = lambda x : str(x)[:-2], inplace=True)
+df15.rename(columns = lambda x : str(x)[:-2], inplace =True)
+
+X_train = df10.drop(columns=['PCT_LACCESS_CHILD','PCT_LACCESS_SENIORS','PCT_NHWHITE', 'PCT_NHBLACK',
+                       'PCT_HISP', 'PCT_NHASIAN', 'PCT_NHNA', 'PCT_NHPI', 
+                       'PCT_65OLDER', 'PCT_18YOUNGER', 'VLFOODSEC_12_', 'FOODINSEC_12_'], axis=1)
+y_train = df10['FOODINSEC_12_']
+
+
+X_test = df15.drop(columns=['PCT_LACCESS_CHILD','PCT_LACCESS_SENIORS','PCT_LACCESS_SNAP','PCT_LACCESS_WHITE',
+             'PCT_LACCESS_BLACK','PCT_LACCESS_HISP', 'PCT_LACCESS_NHASIAN', 'PCT_LACCESS_NHNA', 
+             'PCT_LACCESS_NHPI', 'PCT_LACCESS_MULTIR', 'VLFOODSEC_15_', 'FOODINSEC_15_'], axis=1)
+y_test = df15['FOODINSEC_15_']
+
+X_train = X_train.drop(columns=['PCT_FREE_LUNCH', 'PCT_REDUCED_LUNCH', 'GROCPTH', 'SUPERCPTH',
+       'CONVSPTH', 'SPECSPTH', 'SNAPSPTH', 'FFRPTH', 'FSRPTH', 'PC_FFRSALES',
+       'PC_FSRSALES', 'PCT_SNAP', 'SNAP_PART_RATE', 'PCT_NSLP', 'PCT_SBP',
+       'PCT_SFSP', 'FDPIR', 'DIRSALES_FARMS', 'FMRKTPTH'], axis=1)
+
+
+X_test = X_test.drop(columns=['PCT_FREE_LUNCH', 'PCT_REDUCED_LUNCH', 'GROCPTH', 'SUPERCPTH',
+       'CONVSPTH', 'SPECSPTH', 'SNAPSPTH', 'FFRPTH', 'FSRPTH', 'PC_FFRSALES',
+       'PC_FSRSALES', 'PCT_SNAP', 'SNAP_PART_RATE', 'PCT_NSLP', 'PCT_SBP',
+       'PCT_SFSP', 'FDPIR', 'DIRSALES_FARMS', 'FMRKTPTH'], axis=1)
+
+import statsmodels.api as sm
+X = sm.add_constant(X_train)
+model = sm.OLS(y_train, X).fit()
+model.summary()
+print('R-squared:', model.rsquared)
+print('P-values:', model.pvalues)
+
+from sklearn.linear_model import LinearRegression
+model = LinearRegression()
+model.fit(X_train,y_train)
+print('Test Score:', model.score(X_test,y_test))
+
+# from sklearn.tree import DecisionTreeRegressor
+# dt_model = DecisionTreeRegressor(random_state=42)
+# dt_model.fit(X_train, y_train)
+# dt_pred = dt_model.predict(X_test)
+# dt_mse = mean_squared_error(y_test, dt_pred)
+# print(dt_mse)
+# dt_score = dt_model.score(X_test, y_test)
+# print("Decision Tree score:", dt_score)
+```
+
+### Food Assitance Programs
+
+The dataset gives several variables related to food assistance programs. Here, we look at some of these variables to see if these programs are available in areas with low food accessibility. The input varibles here are Students eligible for free lunch (%), Students eligible for reduced-price lunch (%),  SNAP participants (% pop), SNAP benefits per capita (% change), National School Lunch Program participants (%),  School Breakfast Program participants (% children),  Summer Food Service Program participants (% children), FDPIR (Food Distribution Program on Indian Reservations) sites.
+
+
+```{python}
+X_train = df10.drop(columns=['PCT_LACCESS_CHILD','PCT_LACCESS_SENIORS','PCT_NHWHITE', 'PCT_NHBLACK',
+                       'PCT_HISP', 'PCT_NHASIAN', 'PCT_NHNA', 'PCT_NHPI', 
+                       'PCT_65OLDER', 'PCT_18YOUNGER', 'VLFOODSEC_12_', 'FOODINSEC_12_'], axis=1)
+y_train = df10['PCT_LACCESS_POP']
+
+
+X_test = df15.drop(columns=['PCT_LACCESS_CHILD','PCT_LACCESS_SENIORS','PCT_LACCESS_SNAP','PCT_LACCESS_WHITE',
+             'PCT_LACCESS_BLACK','PCT_LACCESS_HISP', 'PCT_LACCESS_NHASIAN', 'PCT_LACCESS_NHNA', 
+             'PCT_LACCESS_NHPI', 'PCT_LACCESS_MULTIR', 'VLFOODSEC_15_', 'FOODINSEC_15_'], axis=1)
+y_test = df15['PCT_LACCESS_POP']
+
+X_train = X_train.drop(columns=['PCT_LACCESS_POP', 'PCT_LACCESS_LOWI', 'PCT_LACCESS_HHNV',
+       'GROCPTH', 'SUPERCPTH','CONVSPTH', 'SPECSPTH', 'SNAPSPTH', 'FFRPTH', 'FSRPTH', 'PC_FFRSALES',
+       'PC_FSRSALES', 'DIRSALES_FARMS', 'FMRKTPTH'], axis=1)
+X_test =  X_test.drop(columns=['PCT_LACCESS_POP', 'PCT_LACCESS_LOWI', 'PCT_LACCESS_HHNV',
+       'GROCPTH', 'SUPERCPTH','CONVSPTH', 'SPECSPTH', 'SNAPSPTH', 'FFRPTH', 'FSRPTH', 'PC_FFRSALES',
+       'PC_FSRSALES', 'DIRSALES_FARMS', 'FMRKTPTH'], axis=1)
+X = sm.add_constant(X_train)
+model = sm.OLS(y_train, X).fit()
+model.summary()
+print('R-squared:', model.rsquared)
+print('P-values:', model.pvalues)
+
+from sklearn.linear_model import LinearRegression
+model = LinearRegression()
+model.fit(X_train,y_train)
+print('Test Score:', model.score(X_test,y_test))
+
+```
+
+## Discussion 
 
 # Conlusion
 
