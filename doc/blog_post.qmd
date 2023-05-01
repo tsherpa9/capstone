@@ -43,7 +43,7 @@ For columns with a low number of missing values, imputation was done using the m
 
 Overall, the data preprocessing involved merging data, selecting relevant variables and imputing missing values while exploring the nature of the variables. The cleaned dataset was then saved to a new file that is used for analysis.
 
-# Visualizers
+# Visualizations
 Using the cleaned dataset, some variables of interest were explored by producing visualizations. 
 
 ### Food Accessibility 
@@ -53,16 +53,26 @@ To gauge the level of food accessibility in counties, the dataset provides the p
 ```{python}
 import warnings
 warnings.filterwarnings("ignore")
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+import geopandas as gpd
+import plotly.express as px
+import plotly.io as pio
+
+
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import Ridge
+from sklearn.linear_model import Ridge, RidgeCV
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error
+from sklearn.tree import DecisionTreeRegressor
 ```
 
 ```{python}
 #| label: fig-accessdist10
 #| fig-cap: "Distribution of County % Population with Low Food Accessibility"
-
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
 
 df = pd.read_pickle(r'./../data/AtlasCleaned.pkl')
 
@@ -84,14 +94,6 @@ The distribution of the variable reflects an interesting characteristic of food 
 ```{python}
 #| label: fig-map10
 #| fig-cap: "Low Food Accessibility Population Percentages in 2010"
-
-import geopandas as gpd
-import plotly.express as px
-import plotly.io as pio
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
 
 df = pd.read_pickle(r'./../data/AtlasCleaned.pkl')
 
@@ -160,6 +162,29 @@ The plot shows that the data points always fall below the identity function line
 ### Demographic Characteristics
 
 In counties where >80% of the population has low food accessibility, the majority of the population is white, followed by Hispanic and American Indian / Alaska Native.
+```{python}
+df_race = pd.DataFrame(df, columns=['FIPS', 'State', 'County', 'PCT_LACCESS_POP10','PCT_NHWHITE10',
+                                    'PCT_NHBLACK10', 'PCT_HISP10', 'PCT_NHASIAN10','PCT_NHNA10',
+                                    'PCT_NHPI10', 'PCT_LACCESS_POP15', 'PCT_LACCESS_WHITE15',
+                                    'PCT_LACCESS_BLACK15', 'PCT_LACCESS_HISP15','PCT_LACCESS_NHASIAN15', 
+                                    'PCT_LACCESS_NHNA15', 'PCT_LACCESS_NHPI15','PCT_LACCESS_MULTIR15'])
+# df_race.rename(columns = lambda x : str(x)[:-2], inplace=True)
+# df_race.rename(columns={'PCT_NHWHITE10':'WHITE','PCT_NHBLACK10':'BLACK', 'PCT_HISP10':'HISPANIC', 'PCT_NHASIAN10':'ASIAN'
+#   'PCT_NHNA10':'AMER INDIAN / ALASKA NATIVE','PCT_NHPI10':'HAWAIIAN / PACIFIC ISLANDER', 'PCT_LACCESS_WHITE15': 'WHITE',
+#                                     'PCT_LACCESS_BLACK15':'BLACK', 'PCT_LACCESS_HISP15':'HISPANIC','PCT_LACCESS_NHASIAN15':'ASIAN', 
+#                                     'PCT_LACCESS_NHNA15':'AMER INDIAN / ALASKA NATIVE', 'PCT_LACCESS_NHPI15':'HAWAIIAN / PACIFIC ISLANDER',
+#                                     'PCT_LACCESS_MULTIR15':'MULTIR'}, inplace=True)
+
+
+low_access10 = df_race[df['PCT_LACCESS_POP10']>80]
+# type(low_access10.mean())
+print(low_access10.mean()[1:7])
+# table = [low_access10.mean()[1:7],]
+
+low_access15 = df_race[df['PCT_LACCESS_POP15']>80]
+print(low_access15.mean()[8:])
+
+```
 
 # Features' Relationships
 
@@ -167,15 +192,17 @@ Next, we investigate the dependence of some variables in the dataset. First, we 
 
 ### Food Insecurity and Accessibility 
 
-The dataset provides the state-level food insecurity information. Food-insecure are those households that "were unable, at times during the year, to provide adequate food for one or more household members because the household lacked money and other resources for food." [4] The values measuring prevalence food insecurity were given as three-year averages. In the following model, the food insecurity percent average for 2012-2014 are used as response variable for the training set whereas food insecurity percent average for 2015-2017 are used as the response variable for test set.
+The dataset provides state-level food insecurity information. Food-insecure households are those that “were unable, at times during the year, to provide adequate food for one or more household members because the household lacked money and other resources for food.” [4] The values measuring food insecurity were given as three-year averages. In the following model, the food insecurity percent average for 2012-2014 is used as the response variable for the training set whereas the food insecurity percent average for 2015-2017 is used as the response variable for the test set. The data frame used here was created by grouping the rows by state and taking the average. Thus, the data frame contains 51 rows with state-level information. 
 
 ```{python}
-df_avg = df.drop(labels=['LACCESS_POP10', 'LACCESS_POP15',    'PCH_LACCESS_POP_10_15', 'LACCESS_LOWI10', 'LACCESS_LOWI15',
+df.drop(labels=['LACCESS_POP10', 'LACCESS_POP15', 'PCH_LACCESS_POP_10_15', 'LACCESS_LOWI10', 'LACCESS_LOWI15',
                     'PCH_LACCESS_LOWI_10_15', 'LACCESS_HHNV10', 'LACCESS_HHNV15', 'PCH_LACCESS_HHNV_10_15',
                     'LACCESS_SNAP15', 'LACCESS_CHILD10', 'LACCESS_CHILD15', 'LACCESS_CHILD_10_15', 
                     'LACCESS_SENIORS10', 'LACCESS_SENIORS15', 'PCH_LACCESS_SENIORS_10_15', 'LACCESS_WHITE15', 
                     'LACCESS_BLACK15', 'LACCESS_HISP15', 'LACCESS_NHASIAN15', 'LACCESS_NHNA15', 
-                    'LACCESS_NHPI15', 'LACCESS_MULTIR15'], axis=1).groupby(['State']).mean()
+                    'LACCESS_NHPI15', 'LACCESS_MULTIR15'], axis=1, inplace=True)
+
+df_avg = df.groupby(['State']).mean()
 
 df10_cols = ['PCT_LACCESS_POP10', 'PCT_LACCESS_LOWI10', 'PCT_LACCESS_HHNV10',
              'PCT_LACCESS_CHILD10','PCT_LACCESS_SENIORS10', 'PCT_FREE_LUNCH10', 'PCT_REDUCED_LUNCH10',
@@ -196,12 +223,13 @@ df15_cols = ['PCT_LACCESS_POP15', 'PCT_LACCESS_LOWI15', 'PCT_LACCESS_HHNV15',
              'FDPIR15', 'FOODINSEC_15_17','VLFOODSEC_15_17', 'DIRSALES_FARMS12', 'FMRKTPTH18']
 
 # Foodhub, metro 13, medhincome 15 'POVRATE15' are not here
+```
 
+```{python}
 df10 = pd.DataFrame(df_avg, columns = df10_cols)
 df15 = pd.DataFrame(df_avg, columns = df15_cols)
 
-from sklearn.preprocessing import MinMaxScaler
-scaler = MinMaxScaler()
+scaler = StandardScaler()
 
 df10 = pd.DataFrame(scaler.fit_transform(df10), columns=df10.columns)
 df15 = pd.DataFrame(scaler.fit_transform(df15), columns=df15.columns)
@@ -242,53 +270,162 @@ from sklearn.linear_model import LinearRegression
 model = LinearRegression()
 model.fit(X_train,y_train)
 print('Test Score:', model.score(X_test,y_test))
-
-# from sklearn.tree import DecisionTreeRegressor
-# dt_model = DecisionTreeRegressor(random_state=42)
-# dt_model.fit(X_train, y_train)
-# dt_pred = dt_model.predict(X_test)
-# dt_mse = mean_squared_error(y_test, dt_pred)
-# print(dt_mse)
-# dt_score = dt_model.score(X_test, y_test)
-# print("Decision Tree score:", dt_score)
 ```
 
-### Food Assitance Programs
+The linear regression returns very low R2 scores suggesting that the food- accessibility variables may not entirely represent the level of food insecurity in states. 
 
-The dataset gives several variables related to food assistance programs. Here, we look at some of these variables to see if these programs are available in areas with low food accessibility. The input varibles here are Students eligible for free lunch (%), Students eligible for reduced-price lunch (%),  SNAP participants (% pop), SNAP benefits per capita (% change), National School Lunch Program participants (%),  School Breakfast Program participants (% children),  Summer Food Service Program participants (% children), FDPIR (Food Distribution Program on Indian Reservations) sites.
+### Food Assistance Programs
+
+The dataset gives several variables related to food assistance programs. Here, we look at some of these variables to see if these programs are available in areas with low food accessibility. The input variables here are Students eligible for free lunch (%), Students eligible for reduced-price lunch (%),  SNAP participants (% pop), SNAP benefits per capita (% change), National School Lunch Program participants (%),  School Breakfast Program participants (% children),  Summer Food Service Program participants (% children), FDPIR (Food Distribution Program on Indian Reservations) sites. Regression models are created separately for 2010 and 2015 to see how the availability of food assistance programs and food accessibility are related for both years. Following the previous analysis, the same state-level data frame is used for the regression models. 
+
+```{python}
+# create 2010 and 2015 dataframes for states
+df10 = pd.DataFrame(df_avg, columns = df10_cols)
+df15 = pd.DataFrame(df_avg, columns = df15_cols)
+
+scaler = StandardScaler()
+
+df10 = pd.DataFrame(scaler.fit_transform(df10), columns=df10.columns)
+df15 = pd.DataFrame(scaler.fit_transform(df15), columns=df15.columns)
+
+df10.rename(columns = lambda x : str(x)[:-2], inplace=True)
+df10.rename(columns={'FOODINSEC_12_': 'FOODINSEC','VLFOODSEC_12_': 'VLFOODSEC'}, inplace=True)
+
+df15.rename(columns = lambda x : str(x)[:-2], inplace =True)
+df15.rename(columns={'FOODINSEC_15_': 'FOODINSEC','VLFOODSEC_15_': 'VLFOODSEC'}, inplace=True)
+
+
+df10.drop(columns=['PCT_LACCESS_CHILD','PCT_LACCESS_SENIORS','PCT_NHWHITE', 'PCT_NHBLACK',
+                       'PCT_HISP', 'PCT_NHASIAN', 'PCT_NHNA', 'PCT_NHPI', 
+                       'PCT_65OLDER', 'PCT_18YOUNGER'], inplace=True)
+df15.drop(columns=['PCT_LACCESS_CHILD','PCT_LACCESS_SENIORS','PCT_LACCESS_SNAP','PCT_LACCESS_WHITE',
+             'PCT_LACCESS_BLACK','PCT_LACCESS_HISP', 'PCT_LACCESS_NHASIAN', 'PCT_LACCESS_NHNA', 
+             'PCT_LACCESS_NHPI', 'PCT_LACCESS_MULTIR'], inplace=True)
+
+# training and test datasets according to year
+x10 = df10.drop(columns=['VLFOODSEC', 'FOODINSEC'], axis=1)
+y10 = df10['PCT_LACCESS_POP']
+
+x15 = df15.drop(columns=['VLFOODSEC', 'FOODINSEC'], axis=1)
+y15 = df15['PCT_LACCESS_POP']
+
+x10 = x10.drop(columns=['PCT_LACCESS_POP', 'PCT_LACCESS_LOWI', 'PCT_LACCESS_HHNV',
+       'GROCPTH', 'SUPERCPTH','CONVSPTH', 'SPECSPTH', 'SNAPSPTH', 'FFRPTH', 'FSRPTH', 'PC_FFRSALES',
+       'PC_FSRSALES', 'DIRSALES_FARMS', 'FMRKTPTH'], axis=1)
+x15 =  x15.drop(columns=['PCT_LACCESS_POP', 'PCT_LACCESS_LOWI', 'PCT_LACCESS_HHNV',
+       'GROCPTH', 'SUPERCPTH','CONVSPTH', 'SPECSPTH', 'SNAPSPTH', 'FFRPTH', 'FSRPTH', 'PC_FFRSALES',
+       'PC_FSRSALES', 'DIRSALES_FARMS', 'FMRKTPTH'], axis=1)
+
+#  2010 model
+X = sm.add_constant(x10)
+model = sm.OLS(y10, X).fit()
+model.summary()
+print("2010: ")
+print('R-squared:', model.rsquared)
+print('P-values:', model.pvalues)
+
+#  2015 model
+X = sm.add_constant(x15)
+model = sm.OLS(y15, X).fit()
+model.summary()
+print("2015: ")
+print('R-squared:', model.rsquared)
+print('P-values:', model.pvalues)
+
+```
+
+For both years, the r2 scores are similar and less than 0.5. This suggests that the prevalence of food assistance programs is only partly correlated with food accessibility. Although food assistance programs exist to some extent in states with poor food accessibility, this may not be the case for all states.
+
+### Change in Food Accessibility (2010-15)
+
+Lastly, regression models are used to analyze what factors can affect food accessibility in U.S. counties.  
+
+Note: The income and household vehicle availability variables are removed here since they are largely correlated with the food accessibility response variables.
 
 
 ```{python}
-X_train = df10.drop(columns=['PCT_LACCESS_CHILD','PCT_LACCESS_SENIORS','PCT_NHWHITE', 'PCT_NHBLACK',
+# create 2010 and 2015 dataframes for all counties
+df10 = pd.DataFrame(df, columns = df10_cols)
+df15 = pd.DataFrame(df, columns = df15_cols)
+
+# Rename columns
+df10.rename(columns = lambda x : str(x)[:-2], inplace=True)
+df10.rename(columns={'FOODINSEC_12_': 'FOODINSEC','VLFOODSEC_12_': 'VLFOODSEC'}, inplace=True)
+df15.rename(columns = lambda x : str(x)[:-2], inplace =True)
+df15.rename(columns={'FOODINSEC_15_': 'FOODINSEC','VLFOODSEC_15_': 'VLFOODSEC'}, inplace=True)
+
+# Drop columns
+df10.drop(columns=['PCT_LACCESS_CHILD','PCT_LACCESS_SENIORS','PCT_NHWHITE', 'PCT_NHBLACK',
                        'PCT_HISP', 'PCT_NHASIAN', 'PCT_NHNA', 'PCT_NHPI', 
-                       'PCT_65OLDER', 'PCT_18YOUNGER', 'VLFOODSEC_12_', 'FOODINSEC_12_'], axis=1)
-y_train = df10['PCT_LACCESS_POP']
-
-
-X_test = df15.drop(columns=['PCT_LACCESS_CHILD','PCT_LACCESS_SENIORS','PCT_LACCESS_SNAP','PCT_LACCESS_WHITE',
+                       'PCT_65OLDER', 'PCT_18YOUNGER'], inplace=True)
+df15.drop(columns=['PCT_LACCESS_CHILD','PCT_LACCESS_SENIORS','PCT_LACCESS_SNAP','PCT_LACCESS_WHITE',
              'PCT_LACCESS_BLACK','PCT_LACCESS_HISP', 'PCT_LACCESS_NHASIAN', 'PCT_LACCESS_NHNA', 
-             'PCT_LACCESS_NHPI', 'PCT_LACCESS_MULTIR', 'VLFOODSEC_15_', 'FOODINSEC_15_'], axis=1)
-y_test = df15['PCT_LACCESS_POP']
+             'PCT_LACCESS_NHPI', 'PCT_LACCESS_MULTIR'], inplace=True)
 
-X_train = X_train.drop(columns=['PCT_LACCESS_POP', 'PCT_LACCESS_LOWI', 'PCT_LACCESS_HHNV',
-       'GROCPTH', 'SUPERCPTH','CONVSPTH', 'SPECSPTH', 'SNAPSPTH', 'FFRPTH', 'FSRPTH', 'PC_FFRSALES',
-       'PC_FSRSALES', 'DIRSALES_FARMS', 'FMRKTPTH'], axis=1)
-X_test =  X_test.drop(columns=['PCT_LACCESS_POP', 'PCT_LACCESS_LOWI', 'PCT_LACCESS_HHNV',
-       'GROCPTH', 'SUPERCPTH','CONVSPTH', 'SPECSPTH', 'SNAPSPTH', 'FFRPTH', 'FSRPTH', 'PC_FFRSALES',
-       'PC_FSRSALES', 'DIRSALES_FARMS', 'FMRKTPTH'], axis=1)
+# Create dataframe with differences between 2010 & 2015 values as columns
+diff = pd.DataFrame()
+for c in df10.columns:
+    diff[c] = df15[c]-df10[c]
+
+# Scale all columns
+scaler = StandardScaler()
+diff = pd.DataFrame(scaler.fit_transform(diff), columns=diff.columns)
+
+# Drop correlating variables and create train/test data
+X = diff.drop(columns=['PCT_LACCESS_POP','PCT_LACCESS_LOWI','PCT_LACCESS_HHNV'], axis=1)
+y = diff['PCT_LACCESS_POP']
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Apply linear regression
+X = sm.add_constant(X_train)
+model = sm.OLS(y_train, X).fit()
+model.summary()
+print('R-squared:', model.rsquared)
+print('P-values:', model.pvalues)
+```
+
+The model used here does not produce good R2 scores. One reason for this may be that the counties for which there are significant changes are low in number and may seem like unusual values for the dataset. This is shown by the distribution plot shown in @fig-extremediff. 
+
+```{python}
+#| label: fig-extremediff
+#| fig-cap: "Distribution of Change in Low Access Population (Standardized)"
+
+# Plot distribution of difference in low food access pop% 
+def plt_dis(c):
+    f = sns.displot(data=diff, x=c, height=4, aspect=10/8.27, bins=20)
+    plt.ylabel("Number of Counties", alpha=0.8)
+    plt.xlabel("Change in Low Food Access Pop. % (standardized)", alpha=0.8)
+    plt.show()
+plt_dis('PCT_LACCESS_POP')
+```
+Now, we create a model using data for only the counties that have significant changes in food accessibility. For this, the dataset was filtered to contain only counties for which the standardized Change in Food Accessibility was greater than 1.5 and less than -1.5.
+
+```{python}
+# filter data for extreme cases
+df_extreme = diff[diff['PCT_LACCESS_POP'] > 1.5]
+df_extreme = diff[diff['PCT_LACCESS_POP'] < -1.5]
+
+# Drop correlated variables and create train/test data
+X = df_extreme.drop(columns=['PCT_LACCESS_POP','PCT_LACCESS_LOWI','PCT_LACCESS_HHNV'], axis=1)
+y = df_extreme['PCT_LACCESS_POP']
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Linear regression
+print("Linear Regression")
 X = sm.add_constant(X_train)
 model = sm.OLS(y_train, X).fit()
 model.summary()
 print('R-squared:', model.rsquared)
 print('P-values:', model.pvalues)
 
-from sklearn.linear_model import LinearRegression
-model = LinearRegression()
-model.fit(X_train,y_train)
-print('Test Score:', model.score(X_test,y_test))
-
+# Decision Tree
+print("Decision Tree Regression")
+dt_model = DecisionTreeRegressor(random_state=42)
+dt_model.fit(X_train, y_train)
+dt_pred = dt_model.predict(X_test)
+dt_score = dt_model.score(X_test, y_test)
+print("Decision Tree score:", dt_score)
 ```
 
-## Discussion 
-
+The R2 score for linear regression improved significantly for this data frame. The R2 further improves when using a Decision Tree Regrressor.
 # Conlusion
