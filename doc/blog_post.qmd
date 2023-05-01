@@ -292,5 +292,3 @@ print('Test Score:', model.score(X_test,y_test))
 ## Discussion 
 
 # Conlusion
-
-
