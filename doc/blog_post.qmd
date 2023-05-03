@@ -37,7 +37,7 @@ To enable geographic visualizations and analysis, an additional file from the Ar
 
 The information in the dataset was stored in separate worksheets, grouped according to the category of the features. Since there was a large number of features, the first step was to perform feature reduction. This was done by manually selecting the features that were related to the project's questions and goals. Features that contained very granular information were also omitted in order to simplify analysis as well as to obtain more generalized insights.
 
-The dataset and boundary shape file was also compared to check if county FIPS codes and names matched for all observations. From 2010 to 2015, there had been changes to some of the county names and FIPS codes which caused discrepancies between the two datasets. These counties were identified and modified to reflect the changes and match all observations. This brought the number of observations from 3143 to 3142 counties. 
+The dataset and boundary shape file was also compared to check if county FIPS codes and names matched for all observations. Some county names and FIPS codes had changed over the years, which caused discrepancies between the two datasets. These counties were identified and modified to reflect the changes and match all observations. This brought the number of observations from 3143 to 3142 counties. 
 
 For columns with a low number of missing values, imputation was done using the median of those features. This was done while looking at variable distributions to ensure that imputation does not significantly change their distributions. However, median imputation was not appropriate for some 2015 variables that had a larger number of missing values. For these variables, missing values were replaced with numbers from the corresponding feature for 2010. 
 
@@ -53,6 +53,7 @@ To gauge the level of food accessibility in counties, the dataset provides the p
 ```{python}
 import warnings
 warnings.filterwarnings("ignore")
+
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -106,13 +107,35 @@ def plot_chlpth(df, x, label, header):
                         range_color=(0, 100), geojson=tract, featureidkey = "properties.FIPS",
                         scope="usa", hover_data=['State', 'County'],
                         labels=label, title=header)
-  fig.update_layout(legend=dict(orientation="h", yanchor="top",y=1.02,xanchor="right",x=1))
+  fig.update_layout(legend=dict(orientation="h", yanchor="top",y=0.5,xanchor="right",x=1))
   fig.show()
 
 plot_chlpth(df, 'PCT_LACCESS_POP10', {'PCT_LACCESS_POP10':'Popn. %'}, None)
 ```
 
 The choropleth shows that low food accessibility counties are concentrated in the Midwest, Southwest, and West regions of the country. Since food accessibility is defined based on the proximity of households to food stores, the location of the low-access counties could be the product of geographic conditions and living conditions in remote regions.  
+
+```{python}
+#| label: fig-mapChange
+#| fig-cap: "Change in Low Food Access Pop. %"
+
+df_diff = pd.DataFrame(df, columns = ['FIPS', 'State', 'County', 'PCT_LACCESS_POP10', 'PCT_LACCESS_POP15'])
+df_diff['diff'] = df['PCT_LACCESS_POP15'] - df['PCT_LACCESS_POP10']
+
+fig = px.choropleth(df_diff, locations='FIPS',  
+        color='diff',
+        color_continuous_scale="RdBu_r",
+        range_color=(df_diff['diff'].min(), df_diff['diff'].max()),
+        geojson=tract,
+        featureidkey = "properties.FIPS",
+        scope="usa", 
+        hover_data=['State', 'County'],
+        labels={'diff':'Change in %'})
+fig.update_layout(legend=dict(orientation="h", yanchor="top",y=0.5,xanchor="right",x=1))
+fig.show()
+
+```
+
 
 ### Food and Vehicle Access
 
@@ -163,27 +186,39 @@ The plot shows that the data points always fall below the identity function line
 
 In counties where >80% of the population has low food accessibility, the majority of the population is white, followed by Hispanic and American Indian / Alaska Native.
 ```{python}
+from IPython.display import Markdown
+from tabulate import tabulate
+# Create a separate dataframe containing county info and race categories
 df_race = pd.DataFrame(df, columns=['FIPS', 'State', 'County', 'PCT_LACCESS_POP10','PCT_NHWHITE10',
                                     'PCT_NHBLACK10', 'PCT_HISP10', 'PCT_NHASIAN10','PCT_NHNA10',
                                     'PCT_NHPI10', 'PCT_LACCESS_POP15', 'PCT_LACCESS_WHITE15',
                                     'PCT_LACCESS_BLACK15', 'PCT_LACCESS_HISP15','PCT_LACCESS_NHASIAN15', 
                                     'PCT_LACCESS_NHNA15', 'PCT_LACCESS_NHPI15','PCT_LACCESS_MULTIR15'])
-# df_race.rename(columns = lambda x : str(x)[:-2], inplace=True)
-# df_race.rename(columns={'PCT_NHWHITE10':'WHITE','PCT_NHBLACK10':'BLACK', 'PCT_HISP10':'HISPANIC', 'PCT_NHASIAN10':'ASIAN'
-#   'PCT_NHNA10':'AMER INDIAN / ALASKA NATIVE','PCT_NHPI10':'HAWAIIAN / PACIFIC ISLANDER', 'PCT_LACCESS_WHITE15': 'WHITE',
-#                                     'PCT_LACCESS_BLACK15':'BLACK', 'PCT_LACCESS_HISP15':'HISPANIC','PCT_LACCESS_NHASIAN15':'ASIAN', 
-#                                     'PCT_LACCESS_NHNA15':'AMER INDIAN / ALASKA NATIVE', 'PCT_LACCESS_NHPI15':'HAWAIIAN / PACIFIC ISLANDER',
-#                                     'PCT_LACCESS_MULTIR15':'MULTIR'}, inplace=True)
 
+# Store avg pct values for each race here, create table using this dictionary
+table = []
+# all race categories as given by the dataset
+race_catg = ["WHITE", "BLACK", "HISPANIC", "ASIAN", "AMER INDIAN / ALASKA NATIVE", "HAWAIIAN / PACIFIC ISLANDER", "MULTIRACIAL"]
 
+# 2010 very low access counties 
 low_access10 = df_race[df['PCT_LACCESS_POP10']>80]
-# type(low_access10.mean())
-print(low_access10.mean()[1:7])
-# table = [low_access10.mean()[1:7],]
+# Update dictionary with 2010 mean values for very low access counties
+for (mean_pct,catg) in zip(low_access10.mean()[1:7],race_catg):
+  table.append([catg, round(mean_pct, 2)])
 
+# 2015 
 low_access15 = df_race[df['PCT_LACCESS_POP15']>80]
-print(low_access15.mean()[8:])
+for (mean_pct,i) in zip(low_access15.mean()[8:],range(len(race_catg))):
+  mean_pct = round(mean_pct, 2)
+  try:
+    table[i].append(mean_pct)
+  except IndexError:
+    table[-1].append(0)
+    table[-1].append(mean_pct)  # accounting for the extra MULTIRACIAL catg for 2015
 
+Markdown(tabulate(table, 
+  headers=["Race","2010", "2015"]
+))
 ```
 
 # Features' Relationships
@@ -428,4 +463,5 @@ print("Decision Tree score:", dt_score)
 ```
 
 The R2 score for linear regression improved significantly for this data frame. The R2 further improves when using a Decision Tree Regrressor.
+
 # Conlusion
