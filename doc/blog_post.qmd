@@ -219,6 +219,7 @@ for (mean_pct,i) in zip(low_access15.mean()[8:],range(len(race_catg))):
 Markdown(tabulate(table, 
   headers=["Race","2010", "2015"]
 ))
+# end
 ```
 
 # Features' Relationships
