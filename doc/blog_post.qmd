@@ -20,7 +20,7 @@ jupyter: python3
 
 # The Issue
 
-Maintaining a healthy and consistent diet makes for our most basic and important needs. Access to food sources, however, may be limited for many people, leading to issues of food insecurity. In 2010, 14.5% (17.2 million households) in the U.S. were food insecure, 5.4% of which had very low food security (@coleman).  
+Maintaining a healthy and consistent diet makes for our most basic and important needs. Access to food sources, however, may be limited for many people, leading to issues of food insecurity. In 2010, 14.5% (17.2 million households) in the U.S. were food insecure, 5.4% of which had very low food security ( @coleman ).  
  <p style="text-align: center;">Many are left to ask:  
  *“Where’s my next meal going to come from?”*</p> 
 
