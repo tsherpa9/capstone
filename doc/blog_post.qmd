@@ -20,14 +20,14 @@ jupyter: python3
 
 # The Issue
 
-Maintaining a healthy and consistent diet makes for our most basic and important needs. Access to food sources, however, may be limited for many people, leading to issues of food insecurity. In 2010, 14.5% (17.2 million households) in the U.S. were food insecure, 5.4% of which had very low food security [1].  
+Maintaining a healthy and consistent diet makes for our most basic and important needs. Access to food sources, however, may be limited for many people, leading to issues of food insecurity. In 2010, 14.5% (17.2 million households) in the U.S. were food insecure, 5.4% of which had very low food security (@coleman).  
  <p style="text-align: center;">Many are left to ask:  
  *“Where’s my next meal going to come from?”*</p> 
 
 A potential factor that plays a role in determining whether households have a good and consistent supply of nutritious food may be their accessibility to food. Food accessibility is associated with the proximity to grocery stores, food markets, and other food sources. This project looks at the scope of food accessibility for households in different counties. The project also covers the effect of food environment factors such as income, population demographics, and the availability of nutrition programs on food accessibility and food insecurity.  
 
 # Data  
-The project uses the Food Environment Atlas Data from 9/10/2020 (Economic Research Service, n.d.). The dataset has been compiled by the US Department of Agriculture (USDA) Economic Research Service (ERS) to study factors that affect food choices and the accessibility of healthy foods in communities. The information in the dataset had been aggregated from various reports from the USDA, the Bureau of the Census, the U.S. Department of Commerce, and more for the years 2006 to 2019. Food accessibility population data, which is the focus of the project, were given for 2010 and 2015.   
+The project uses the Food Environment Atlas Data from 9/10/2020 (@dataset). The dataset has been compiled by the US Department of Agriculture's (USDA) Economic Research Service (ERS) to study factors that affect food choices and the accessibility of healthy foods in communities. The information in the dataset had been aggregated from various reports from the USDA, the Bureau of the Census, the U.S. Department of Commerce, and more for the years 2006 to 2019. Food accessibility population data, which is the focus of the project, were given for 2010 and 2015.   
 
 The dataset contains county-level information on food environment factors such as access to grocery stores/supermarkets/restaurants, local food sales, food prices, food assistance programs like SNAP (Supplemental Nutrition Assistance Program), National School Lunch Program, etc., socioeconomic characteristics, and some health/physical activities. State-level information on household food insecurity is also given. The dataset contained data on 3143 counties, each uniquely identified with their FIPS code.
 
@@ -48,7 +48,7 @@ Using the cleaned dataset, some variables of interest were explored by producing
 
 ### Food Accessibility 
  
-To gauge the level of food accessibility in counties, the dataset provides the percentage of the population with low food accessibility. For this dataset, low accessibility populations are considered to be those "living more than 1 mile from a supermarket or large grocery store if in an urban area, or more than 10 miles from a supermarket or large grocery store if in a rural area" [2].  
+To gauge the level of food accessibility in counties, the dataset provides the percentage of the population with low food accessibility. For this dataset, low accessibility populations are considered to be those "living more than 1 mile from a supermarket or large grocery store if in an urban area, or more than 10 miles from a supermarket or large grocery store if in a rural area" (@documentation).  
 
 ```{python}
 import warnings
@@ -161,7 +161,7 @@ In other counties, although food accessibility is bad, most households have acce
 
 ### Income and Food Access
 
-Income is another crucial factor that can impact access to food. Low-income groups may be more sensitive to food prices and the lack of food availability in close proximity to their homes. The scatter plot charts the population with low food accessibility and populations with both low income and low food access. Here, low income is defined as "annual family income of less than or equal to 200 percent of the Federal poverty threshold based on family size." [3] 
+Income is another crucial factor that can impact access to food. Low-income groups may be more sensitive to food prices and the lack of food availability in close proximity to their homes. The scatter plot charts the population with low food accessibility and populations with both low income and low food access. Here, low income is defined as "annual family income of less than or equal to 200 percent of the Federal poverty threshold based on family size" (@documentation).
 
 ```{python}
 #| label: fig-income10
@@ -227,7 +227,7 @@ Next, we investigate the dependence of some variables in the dataset. First, we 
 
 ### Food Insecurity and Accessibility 
 
-The dataset provides state-level food insecurity information. Food-insecure households are those that “were unable, at times during the year, to provide adequate food for one or more household members because the household lacked money and other resources for food.” [4] The values measuring food insecurity were given as three-year averages. In the following model, the food insecurity percent average for 2012-2014 is used as the response variable for the training set whereas the food insecurity percent average for 2015-2017 is used as the response variable for the test set. The data frame used here was created by grouping the rows by state and taking the average. Thus, the data frame contains 51 rows with state-level information. 
+The dataset provides state-level food insecurity information. Food-insecure households are those that “were unable, at times during the year, to provide adequate food for one or more household members because the household lacked money and other resources for food” (@documentation). The values measuring food insecurity were given as three-year averages. In the following model, the food insecurity percent average for 2012-2014 is used as the response variable for the training set whereas the food insecurity percent average for 2015-2017 is used as the response variable for the test set. The data frame used here was created by grouping the rows by state and taking the average. Thus, the data frame contains 51 rows with state-level information. 
 
 ```{python}
 df.drop(labels=['LACCESS_POP10', 'LACCESS_POP15', 'PCH_LACCESS_POP_10_15', 'LACCESS_LOWI10', 'LACCESS_LOWI15',
