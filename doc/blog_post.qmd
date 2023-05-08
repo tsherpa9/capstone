@@ -635,12 +635,12 @@ The $r^2$ score for the linear regression model improved significantly when cons
 
 The smallest p-value here is for the FDPIR variable which measures the Food Distribution Program on Indian Reservations. This variable may have been significant in the model because the extreme counties filtered here fall in regions where Native American populations are more significant. 
 
-# Conlusion
+# Conclusion
 
 This project analyzed food accessibility and other food environment factors. The analysis showed that counties with low food accessibility can be divided into two groups: those with low and very low food accessibility. The counties with very low food accessibility are located in the West and Midwest regions of the country, with populations primarily consisting of White, Hispanic, and Native American/ Alaska Native people. Additionally, the analysis also revealed a correlation between income and food accessibility, as a significant proportion of the population in counties with low food accessibility had low incomes.
 
 Initially, all counties were found to have low food accessibility. However, examining household vehicle availability suggested that the problem may be less severe, as the majority of counties with poor food access had access to cars. There were only a few counties in which low food accessibility coincided with a lack of available vehicles.
-
+x
 Food accessibility remained largely remained the same from 2010 to 2015, with significant changes only occurring in counties with very low food accessibility. The regression model used here tried to look explain the changes by looking at how number of food stores/sources and assistance programs changed. However, these factors were not sufficient build an accurate model which is likely due to the absence of significant variables in the dataset. 
 
 Finally, regression models were used to assess the relationship between food insecurity and food accessibility, as well as other food environment factors. The analysis revealed that food insecurity cannot be fully explained by food accessibility alone. Additional factors such as income, poverty rates, and unemployment levels may also be significant. However, these variables could not be included in the current models due to their absence from the dataset or overlap with the response variables. Future analysis could incorporate such variables from other datasets to gain a more comprehensive understanding of food insecurity.
